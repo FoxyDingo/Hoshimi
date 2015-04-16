@@ -1,0 +1,14 @@
+C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2009_10\projecto\fornecido\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\bin\Debug\AASMAHoshimi.dll
+C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2009_10\projecto\fornecido\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\bin\Debug\AASMAHoshimi.pdb
+C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2009_10\projecto\fornecido\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2009_10\projecto\fornecido\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.Properties.Resources.resources
+C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2009_10\projecto\fornecido\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.csproj.GenerateResource.Cache
+C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2009_10\projecto\fornecido\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.dll
+C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2009_10\projecto\fornecido\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.pdb
+C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2010_11\projecto\fornecido\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\bin\Debug\AASMAHoshimi.dll
+C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2010_11\projecto\fornecido\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\bin\Debug\AASMAHoshimi.pdb
+C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2010_11\projecto\fornecido\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2010_11\projecto\fornecido\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.Properties.Resources.resources
+C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2010_11\projecto\fornecido\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.csproj.GenerateResource.Cache
+C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2010_11\projecto\fornecido\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.dll
+C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2010_11\projecto\fornecido\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.pdb

@@ -1,0 +1,10 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <StartAction>Program</StartAction>
+    <StartWorkingDirectory>C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2009_10\projecto\fornecido\proj hoshimi\PH2007SDK\</StartWorkingDirectory>
+    <StartArguments>
+    </StartArguments>
+    <RemoteDebugEnabled>false</RemoteDebugEnabled>
+    <StartProgram>C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2009_10\projecto\fornecido\proj hoshimi\PH2007SDK\ProjectHoshimi.exe</StartProgram>
+  </PropertyGroup>
+</Project>

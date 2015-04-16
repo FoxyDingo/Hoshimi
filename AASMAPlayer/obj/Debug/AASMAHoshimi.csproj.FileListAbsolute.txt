@@ -1,0 +1,21 @@
+C:\FDK\IST\Mestrado\AASMA\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\bin\Debug\AASMAHoshimi.dll
+C:\FDK\IST\Mestrado\AASMA\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\bin\Debug\AASMAHoshimi.pdb
+C:\FDK\IST\Mestrado\AASMA\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.csprojResolveAssemblyReference.cache
+C:\FDK\IST\Mestrado\AASMA\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.Properties.Resources.resources
+C:\FDK\IST\Mestrado\AASMA\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.csproj.GenerateResource.Cache
+C:\FDK\IST\Mestrado\AASMA\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.dll
+C:\FDK\IST\Mestrado\AASMA\proj hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.pdb
+C:\FDK\IST\Mestrado\AASMA\hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\bin\Debug\AASMAHoshimi.dll
+C:\FDK\IST\Mestrado\AASMA\hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\bin\Debug\AASMAHoshimi.pdb
+C:\FDK\IST\Mestrado\AASMA\hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.csprojResolveAssemblyReference.cache
+C:\FDK\IST\Mestrado\AASMA\hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.Properties.Resources.resources
+C:\FDK\IST\Mestrado\AASMA\hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.csproj.GenerateResource.Cache
+C:\FDK\IST\Mestrado\AASMA\hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.dll
+C:\FDK\IST\Mestrado\AASMA\hoshimi\ProjectHoshimiAASMA_v1_1_1\AASMAPlayer\obj\Debug\AASMAHoshimi.pdb
+C:\FDK\IST\Mestrado\AASMA\hoshimi\ProjectHoshimiAASMA_v1_1_1\Hoshimi\AASMAPlayer\bin\Debug\AASMAHoshimi.dll
+C:\FDK\IST\Mestrado\AASMA\hoshimi\ProjectHoshimiAASMA_v1_1_1\Hoshimi\AASMAPlayer\bin\Debug\AASMAHoshimi.pdb
+C:\FDK\IST\Mestrado\AASMA\hoshimi\ProjectHoshimiAASMA_v1_1_1\Hoshimi\AASMAPlayer\obj\Debug\AASMAHoshimi.csprojResolveAssemblyReference.cache
+C:\FDK\IST\Mestrado\AASMA\hoshimi\ProjectHoshimiAASMA_v1_1_1\Hoshimi\AASMAPlayer\obj\Debug\AASMAHoshimi.Properties.Resources.resources
+C:\FDK\IST\Mestrado\AASMA\hoshimi\ProjectHoshimiAASMA_v1_1_1\Hoshimi\AASMAPlayer\obj\Debug\AASMAHoshimi.csproj.GenerateResource.Cache
+C:\FDK\IST\Mestrado\AASMA\hoshimi\ProjectHoshimiAASMA_v1_1_1\Hoshimi\AASMAPlayer\obj\Debug\AASMAHoshimi.dll
+C:\FDK\IST\Mestrado\AASMA\hoshimi\ProjectHoshimiAASMA_v1_1_1\Hoshimi\AASMAPlayer\obj\Debug\AASMAHoshimi.pdb

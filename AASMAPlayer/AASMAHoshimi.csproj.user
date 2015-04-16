@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <StartAction>Program</StartAction>
+    <StartWorkingDirectory>C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2009_10\projecto\fornecido\proj hoshimi\PH2007SDK\</StartWorkingDirectory>
+    <StartArguments>
+    </StartArguments>
+    <RemoteDebugEnabled>false</RemoteDebugEnabled>
+    <StartProgram>C:\Users\CesarPim\Documents\Trabalho\Aulas\aasma2009_10\projecto\fornecido\proj hoshimi\PH2007SDK\ProjectHoshimi.exe</StartProgram>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PublishUrlHistory />
+    <InstallUrlHistory />
+    <SupportUrlHistory />
+    <UpdateUrlHistory />
+    <BootstrapperUrlHistory />
+    <ErrorReportUrlHistory />
+    <FallbackCulture>en-US</FallbackCulture>
+    <VerifyUploadedFiles>false</VerifyUploadedFiles>
+  </PropertyGroup>
+</Project>
