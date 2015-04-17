@@ -12,14 +12,16 @@ namespace AASMAHoshimi.Examples
 {
     public class ReactiveAI : AASMAAI
     {
-        private bool _hasObj = false;
-        private Object _objPoint;
+        private List<Point> hoshimiesPoint = new List<Point>();
+        private List<Point> hoshimiesNeedle = new List<Point>();
+        //private bool _hasObj = false;
+        //private Object _objPoint;
 
-        public Point ObjPoint
+        /*public Point ObjPoint
         {
             get { return (Point)_objPoint; }
             set { _objPoint = value; }
-        }
+        }*/
 
         public ReactiveAI(NanoAI nanoAI)
             : base(nanoAI)
@@ -31,7 +33,7 @@ namespace AASMAHoshimi.Examples
         {
             //builds one nanobot of the type Explorer
             //the explorersAlive method gives us the number of nano explorers that are still alive (i.e. not destroyed)
-            if (getAASMAFramework().explorersAlive() == 0)
+            if (getAASMAFramework().explorersAlive() < 5)
                 {
                 //we want to identify explorers with the names E1,E2,E3,...
                 //that's why we use the explorerNumber++;
@@ -42,22 +44,26 @@ namespace AASMAHoshimi.Examples
                 
             }
 
-            if (_hasObj && getNanoBot().State == NanoBotState.WaitingOrders)
+            if (hoshimiesPoint.Count > 0 && getNanoBot().State == NanoBotState.WaitingOrders && getNanoBot().Location.Equals(hoshimiesPoint[0]))
+            {
+                getAASMAFramework().logData(this._nanoAI, "Building needle ");
+                this._nanoAI.Build(typeof(PassiveNeedle), "N" + this._needleNumber++);
+                hoshimiesNeedle.Add(hoshimiesPoint[0]);
+                hoshimiesPoint.RemoveAt(0);
+                
+            }
+
+            if (hoshimiesPoint.Count > 0 && getNanoBot().State == NanoBotState.WaitingOrders)
             {
                 
-                Point p = ObjPoint;
+                Point p = hoshimiesPoint[0];
                 //getAASMAFramework().logData(this._nanoAI, "I wanna move " );
                 getNanoBot().MoveTo(p);
 
 
             }
 
-            if (_hasObj && getNanoBot().State == NanoBotState.WaitingOrders && getNanoBot().Location.Equals(ObjPoint))
-            {
-                getAASMAFramework().logData(this._nanoAI, "Building needle ");
-                this._nanoAI.Build(typeof(PassiveNeedle), "N" + this._needleNumber++);
-                _hasObj = false;
-            }
+            
             
         }
 
@@ -72,8 +78,13 @@ namespace AASMAHoshimi.Examples
             if (msg.Content.Equals("I've found an hoshimi point! Go there man!"))
             {
                 Point p = (Point)msg.Tag;
-                _hasObj = true;
-                ObjPoint = p;
+               // _hasObj = true;
+                //ObjPoint = p;
+                if(!hoshimiesNeedle.Contains(p) && !hoshimiesPoint.Contains(p)){
+                    hoshimiesPoint.Add(p);
+                }
+
+                
                 //getAASMAFramework().logData(this._nanoAI, "I have to go to this point " + p.X + " , " + p.Y);
             }
         }

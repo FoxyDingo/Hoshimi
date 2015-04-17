@@ -10,23 +10,35 @@ namespace AASMAHoshimi.Examples
     [Characteristics(ContainerCapacity = 0, CollectTransfertSpeed = 0, Scan = 30, MaxDamage = 0, DefenseDistance = 0, Constitution = 10)]
     public class ReactiveExplorer : AASMAExplorer
     {
+        private List<Point> hoshimiesBroadcasted = new List<Point>();
+
         public override void DoActions()
         {
             List<Point> points;
+            
+
             points = getAASMAFramework().visibleHoshimies(this);
             //if this explorer sees an hoshimi point, it will warn the nanoAI agent about it
             //an hoshimi point is where the AI can build needles
             if (points.Count > 0)
             {
-                //the sender and receivers of the message are identified by their internal name, E1, E2,..., C1,C2,...,N1,N2, AI, etc
-                AASMAMessage msg = new AASMAMessage(this.InternalName, "I've found an hoshimi point! Go there man!");
-                //something nice about messages, you can add any object you like to the message as a tag
-                //on the receiver side you need to cast it to the right object and then u can use it
-                //in this case, we're tagging along the hoshimi point the explorer just seen
-                msg.Tag = points[0];
-                //this method sends a message to a particular nanobot, in this case it sends it to the AI nanobot
-                //the AI nanobot is allways called AI and u should not change it's internal name
-                getAASMAFramework().sendMessage(msg, "AI");
+                foreach(Point p in points)
+                {
+                    if (!hoshimiesBroadcasted.Contains(p))
+                    {
+                        AASMAMessage msg = new AASMAMessage(this.InternalName, "I've found an hoshimi point! Go there man!");
+
+                        msg.Tag = p;
+
+                        getAASMAFramework().sendMessage(msg, "AI");
+                        hoshimiesBroadcasted.Add(p);
+                        break;
+                    }
+
+                   
+                }
+
+                
 
             }
             
