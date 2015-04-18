@@ -14,6 +14,8 @@ namespace AASMAHoshimi.Examples
     {
         private List<Point> hoshimiesPoint = new List<Point>();
         private List<Point> hoshimiesNeedle = new List<Point>();
+        private bool _distributeNavPoint = false;
+        private Point _pointToDistribute;
         //private bool _hasObj = false;
         //private Object _objPoint;
 
@@ -31,6 +33,27 @@ namespace AASMAHoshimi.Examples
 
         public override void DoActions()
         {
+
+            if (_distributeNavPoint)
+            {
+                for (int i = 1; i < this._explorerNumber; i++)
+                {
+                    AASMAMessage msg2 = new AASMAMessage("AI", "I've visited a NAVPOINT");
+                    msg2.Tag = _pointToDistribute;
+
+                    string e = "E" + i;
+
+
+                    getAASMAFramework().sendMessage(msg2, e);
+                    //TODO DONT KNOW WHY BUT THIS ONLY WORKS WITH BROADCAST
+                    //getAASMAFramework().broadCastMessage(msg2);
+                    getAASMAFramework().logData(this._nanoAI, "sending msg to " + msg2.Receiver + " : " + msg2.Content);
+
+                }
+                _distributeNavPoint = false;
+            }
+
+
             //builds one nanobot of the type Explorer
             //the explorersAlive method gives us the number of nano explorers that are still alive (i.e. not destroyed)
             if (getAASMAFramework().explorersAlive() < 5)
@@ -70,23 +93,33 @@ namespace AASMAHoshimi.Examples
 
         public override void receiveMessage(AASMAMessage msg)
         {
-            //this AI also handles messages, writing them in the debug log file
-            //the logData method is very usefull for debbuging purposes
-            //it will write the turn number and name of the agent who wrote in the log
-            getAASMAFramework().logData(this._nanoAI, "received message from " + msg.Sender + " : " + msg.Content);
+                //this AI also handles messages, writing them in the debug log file
+                //the logData method is very usefull for debbuging purposes
+                //it will write the turn number and name of the agent who wrote in the log
+                getAASMAFramework().logData(this._nanoAI, "received message from " + msg.Sender + " : " + msg.Content);
 
-            if (msg.Content.Equals("I've found an hoshimi point! Go there man!"))
-            {
-                Point p = (Point)msg.Tag;
-               // _hasObj = true;
-                //ObjPoint = p;
-                if(!hoshimiesNeedle.Contains(p) && !hoshimiesPoint.Contains(p)){
-                    hoshimiesPoint.Add(p);
+                if (msg.Content.Equals("I've found an hoshimi point! Go there man!"))
+                {
+                    Point p = (Point)msg.Tag;
+                    // _hasObj = true;
+                    //ObjPoint = p;
+                    if (!hoshimiesNeedle.Contains(p) && !hoshimiesPoint.Contains(p))
+                    {
+                        hoshimiesPoint.Add(p);
+                    }
+
+
+                    //getAASMAFramework().logData(this._nanoAI, "I have to go to this point " + p.X + " , " + p.Y);
                 }
 
-                
-                //getAASMAFramework().logData(this._nanoAI, "I have to go to this point " + p.X + " , " + p.Y);
-            }
+                //TODO REMOVE msg.Sender.Equals("AI") when the broadcast problem is resolved
+                if (msg.Content.Equals("I've visited a NAVPOINT") && !msg.Sender.Equals("AI"))
+                {
+                    Point p = (Point) msg.Tag;
+                    _distributeNavPoint = true;
+                    _pointToDistribute = p;
+                }
+
         }
     }
 }
