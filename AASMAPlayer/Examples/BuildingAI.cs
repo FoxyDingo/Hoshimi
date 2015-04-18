@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using AASMAHoshimi;
 using PH.Common;
+using AASMAHoshimi.ReactiveAgents;
 
 namespace AASMAHoshimi.Examples
 {

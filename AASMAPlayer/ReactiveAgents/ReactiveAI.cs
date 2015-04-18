@@ -6,6 +6,8 @@ using System.Text;
 using System.Drawing;
 using PH.Common;
 using AASMAHoshimi;
+using AASMAHoshimi.Examples;
+using AASMAHoshimi.ReactiveAgents;
 
 
 
@@ -34,7 +36,6 @@ namespace AASMAHoshimi.Examples
         {
         }
         
-
         public override void DoActions()
         {
 
@@ -86,6 +87,18 @@ namespace AASMAHoshimi.Examples
             {
                 this._nanoAI.Build(typeof(ReactiveProtector), "P" + this._protectorNumber++);
             }
+
+
+            
+
+            //builds one nanobot of the type Container
+            if (getAASMAFramework().containersAlive() < 3)
+            {
+                getAASMAFramework().logData(this._nanoAI, "Building container");
+                this._nanoAI.Build(typeof(ReactiveContainer), "C" + this._containerNumber++);
+
+            }
+
 
             //BUILD NEEDLE ON HOSHIMI POINT
             if (hoshimiesPoint.Count > 0 && getNanoBot().State == NanoBotState.WaitingOrders && getNanoBot().Location.Equals(hoshimiesPoint[0]))
