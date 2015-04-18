@@ -23,12 +23,7 @@ namespace AASMAHoshimi.ReactiveAgents
         public override void DoActions()
         {
             List<Point> points;
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/master
-
-         
            //Tells containers the azn positions found
             if (this.getAASMAFramework().overAZN(this))
             {

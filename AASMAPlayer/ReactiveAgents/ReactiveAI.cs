@@ -5,12 +5,9 @@ using System.Text;
 
 using System.Drawing;
 using PH.Common;
-<<<<<<< HEAD
-using AASMAHoshimi.ReactiveAgents;
-using AASMAHoshimi.Examples;
-=======
 using AASMAHoshimi;
->>>>>>> origin/master
+using AASMAHoshimi.Examples;
+using AASMAHoshimi.ReactiveAgents;
 
 
 

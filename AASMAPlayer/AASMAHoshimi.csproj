@@ -71,6 +71,7 @@
     <Compile Include="ReactiveAgents\Perception.cs" />
     <Compile Include="ReactiveAgents\ReactiveAgent.cs" />
     <Compile Include="ReactiveAgents\ReactiveAI.cs" />
+    <Compile Include="ReactiveAgents\ReactiveContainer.cs" />
     <Compile Include="ReactiveAgents\ReactiveExplorer.cs" />
     <Compile Include="Examples\PassiveContainer.cs" />
     <Compile Include="Examples\ForwardExplorer.cs" />
