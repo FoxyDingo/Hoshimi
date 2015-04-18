@@ -5,10 +5,12 @@ using AASMAHoshimi;
 
 using System.Drawing;
 using PH.Common;
+using AASMAHoshimi.ReactiveAgents;
+using AASMAHoshimi.Examples;
 
 
 
-namespace AASMAHoshimi.Examples
+namespace AASMAHoshimi.ReactiveAgents
 {
     public class ReactiveAI : AASMAAI
     {
@@ -30,7 +32,6 @@ namespace AASMAHoshimi.Examples
         {
         }
         
-
         public override void DoActions()
         {
 
@@ -65,6 +66,14 @@ namespace AASMAHoshimi.Examples
                 //however, if you do this, you won't be able to send him personal messages
                 this._nanoAI.Build(typeof(ReactiveExplorer), "E" + this._explorerNumber++);
                 
+            }
+
+            //builds one nanobot of the type Container
+            if (getAASMAFramework().containersAlive() < 3)
+            {
+                getAASMAFramework().logData(this._nanoAI, "Building container");
+                this._nanoAI.Build(typeof(ReactiveContainer), "C" + this._containerNumber++);
+
             }
 
             if (hoshimiesPoint.Count > 0 && getNanoBot().State == NanoBotState.WaitingOrders && getNanoBot().Location.Equals(hoshimiesPoint[0]))

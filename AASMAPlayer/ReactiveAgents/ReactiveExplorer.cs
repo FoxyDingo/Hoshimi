@@ -4,7 +4,7 @@ using System.Text;
 using System.Drawing;
 using PH.Common;
 
-namespace AASMAHoshimi.Examples
+namespace AASMAHoshimi.ReactiveAgents
 {
     //this is an explorer that does not move much (not much of a good explorer) but is a mouthfull
     [Characteristics(ContainerCapacity = 0, CollectTransfertSpeed = 0, Scan = 30, MaxDamage = 0, DefenseDistance = 0, Constitution = 10)]
@@ -21,8 +21,26 @@ namespace AASMAHoshimi.Examples
         public override void DoActions()
         {
             List<Point> points;
-            
 
+         
+           //Tells containers the azn positions found
+            if (this.getAASMAFramework().overAZN(this))
+            {
+                getAASMAFramework().logData(this, "AZN POINT FOUND");
+                for (int i = 0; i < this.getAASMAFramework().NanoBots.Count; i++)
+                {
+                    //getAASMAFramework().logData(this, "NANO NAME: " + this.getAASMAFramework().NanoBots[i].InternalName);
+                    if( this.getAASMAFramework().NanoBots[i].InternalName.StartsWith("C"))
+                    {
+                        AASMAMessage msg = new AASMAMessage(this.InternalName, "I've visited a AZN POINT");
+                        msg.Tag = Location;
+                        getAASMAFramework().sendMessage(msg,this.getAASMAFramework().NanoBots[i].InternalName);
+                    }
+                }
+            }
+                       
+           
+            
             //TELL AI YOU VISITED A NAVPOINT
             if (_movingToNavPoint.Count > 0 && Location.Equals(_movingToNavPoint[0]))
             {
