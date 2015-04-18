@@ -110,11 +110,27 @@ namespace AASMAHoshimi.Examples
             //MOVE RANDOMLY
             if (!_hasHoshimies && this.State == NanoBotState.WaitingOrders)
             {
-                RandomTurn();
-                MoveForward();
-            }
+                if (frontClear())
+                {
+                    if (Utils.randomValue(100) < 80)
+                    {
+                        this.MoveForward();
+                    }
+                    else
+                    {
+                        this.RandomTurn();
+                    }
+                }
+                else
+                {
+                    this.RandomTurn();
+                }
 
+
+            }
         }
+
+        
 
         public override void receiveMessage(AASMAMessage msg)
         {

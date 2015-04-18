@@ -68,6 +68,7 @@
     <Compile Include="AASMAPlayer.cs" />
     <Compile Include="Examples\BuildingAI.cs" />
     <Compile Include="Examples\CommunicativeExplorer.cs" />
+    <Compile Include="ReactiveAgents\ReactiveProtector.cs" />
     <Compile Include="ReactiveAgents\Perception.cs" />
     <Compile Include="ReactiveAgents\ReactiveAgent.cs" />
     <Compile Include="ReactiveAgents\ReactiveAI.cs" />
