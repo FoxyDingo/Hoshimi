@@ -16,9 +16,6 @@ namespace AASMAHoshimi.Examples
         private List<Point> hoshimiesNeedle = new List<Point>();
         private bool _distributeNavPoint = false;
         private Point _pointToDistribute;
-        private bool _distributeNavPointMov = false;
-        private Point _pointToDistributeMov;
-        private string _pointToDistributeMovName;
         //private bool _hasObj = false;
         //private Object _objPoint;
 
@@ -54,24 +51,6 @@ namespace AASMAHoshimi.Examples
 
                 }
                 _distributeNavPoint = false;
-            }
-
-            if (_distributeNavPointMov)
-            {
-                for (int i = 1; i < this._explorerNumber; i++)
-                {
-                    AASMAMessage msg2 = new AASMAMessage(_pointToDistributeMovName, "I've found a NAVPOINT! moving...");
-                    msg2.Tag = _pointToDistributeMov;
-
-                    string e = "E" + i;
-
-
-                    getAASMAFramework().sendMessage(msg2, e);
-                    
-                    getAASMAFramework().logData(this._nanoAI, "sending msg to " + msg2.Receiver + " : " + msg2.Content);
-
-                }
-                _distributeNavPointMov = false;
             }
 
 
@@ -133,20 +112,12 @@ namespace AASMAHoshimi.Examples
                     //getAASMAFramework().logData(this._nanoAI, "I have to go to this point " + p.X + " , " + p.Y);
                 }
 
-                
-                if (msg.Content.Equals("I've visited a NAVPOINT"))
+                //TODO REMOVE msg.Sender.Equals("AI") when the broadcast problem is resolved
+                if (msg.Content.Equals("I've visited a NAVPOINT") && !msg.Sender.Equals("AI"))
                 {
                     Point p = (Point) msg.Tag;
                     _distributeNavPoint = true;
                     _pointToDistribute = p;
-                }
-
-                if (msg.Content.Equals("I've found a NAVPOINT! moving...") )
-                {
-                    Point p = (Point)msg.Tag;
-                    _distributeNavPointMov = true;
-                    _pointToDistributeMov = p;
-                    _pointToDistributeMovName = msg.Sender;
                 }
 
         }

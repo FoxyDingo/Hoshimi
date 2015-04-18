@@ -16,14 +16,12 @@ namespace AASMAHoshimi.Examples
         //this is only used to stop the explorer from going to a previously explored navPoint
         private List<Point> _movingToNavPoint = new List<Point>();
         private bool _hasHoshimies = false;
-        //Value from 0 to 20; The higher the value the more likely the agent is to not following the other agents
-        private int percentageDefect = 15;
 
 
         public override void DoActions()
         {
             List<Point> points;
-
+            
 
             //TELL AI YOU VISITED A NAVPOINT
             if (_movingToNavPoint.Count > 0 && Location.Equals(_movingToNavPoint[0]))
@@ -34,7 +32,7 @@ namespace AASMAHoshimi.Examples
 
                 getAASMAFramework().sendMessage(msg, "AI");
                 //We are gonna receive our own message. We update the navPointVisited when we receive that message
-
+                
             }
 
             points = getAASMAFramework().visibleHoshimies(this);
@@ -45,7 +43,7 @@ namespace AASMAHoshimi.Examples
                 //We reset the variable because we only want the explorer to move if all hoshimi points have been broadcasted
                 _hasHoshimies = false;
 
-                foreach (Point p in points)
+                foreach(Point p in points)
                 {
                     if (!hoshimiesBroadcasted.Contains(p))
                     {
@@ -60,7 +58,7 @@ namespace AASMAHoshimi.Examples
                         break;
                     }
 
-
+                   
                 }
 
                 // **** DEBUG ONLY ****
@@ -69,19 +67,18 @@ namespace AASMAHoshimi.Examples
                     AASMAMessage msg = new AASMAMessage(this.InternalName, "I DONT HAVE MORE HOSHIMIES");
                     getAASMAFramework().sendMessage(msg, "AI");
                 }
-                else
-                {
+                else {
 
                     AASMAMessage msg = new AASMAMessage(this.InternalName, "I still have hoshimies to broadcast");
                     getAASMAFramework().sendMessage(msg, "AI");
                 }
                 /// ****** ////
+               
 
-
-
+                
 
             }
-
+            
             // GO TO NAV POINT
             points = getAASMAFramework().visibleNavigationPoints(this);
             if (points.Count > 0 && !_hasHoshimies)
@@ -93,10 +90,10 @@ namespace AASMAHoshimi.Examples
                     {
                         AASMAMessage msg = new AASMAMessage(this.InternalName, "I've found a NAVPOINT! moving...");
 
-                        msg.Tag = p;
+                        //msg.Tag = p;
 
                         getAASMAFramework().sendMessage(msg, "AI");
-                        // navPointBroadcasted.Add(p);
+                       // navPointBroadcasted.Add(p);
                         this._movingToNavPoint.Add(p);
                         this.MoveTo(p);
                         break;
@@ -104,7 +101,7 @@ namespace AASMAHoshimi.Examples
 
 
                 }
-
+           
             }
 
             //MOVE RANDOMLY
@@ -113,7 +110,7 @@ namespace AASMAHoshimi.Examples
                 RandomTurn();
                 MoveForward();
             }
-
+                
         }
 
         public override void receiveMessage(AASMAMessage msg)
@@ -123,33 +120,24 @@ namespace AASMAHoshimi.Examples
                 getAASMAFramework().logData(this, "somebody visited a navpoint");
                 Point p = (Point)msg.Tag;
                 navPointVisited.Add(p);
-                if (_movingToNavPoint.Contains(p))
+                try
                 {
-                    this.StopMoving();
-                    _movingToNavPoint.RemoveAt(0);
-
-                }
-            }
-
-            if (msg.Content.Equals("I've found a NAVPOINT! moving...") && !msg.Sender.Equals(this.InternalName))
-            {
-                getAASMAFramework().logData(this, "somebody is moving to a navpoint");
-                Point p = (Point)msg.Tag;
-                if (!_movingToNavPoint.Contains(p)) 
-                { 
-                    int rnd = Utils.randomValue(20);
-                    if (rnd < percentageDefect)
+                    if (_movingToNavPoint.Contains(p))
                     {
-                        getAASMAFramework().logData(this, "I wont move here, too many people interested");
-                        navPointVisited.Add(p);
+                        this.StopMoving();
+                        _movingToNavPoint.RemoveAt(0);
+
                     }
                 }
-
-
-                
-                
+                catch (Exception e)
+                {
+                    //TODO
+                    getAASMAFramework().logData(this.getAASMAFramework().NanoBots[0], "EXCEPTIIION " + e.ToString());
+                }
             }
 
+
         }
+
     }
 }
