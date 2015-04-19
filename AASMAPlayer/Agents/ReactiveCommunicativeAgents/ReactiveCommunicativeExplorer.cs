@@ -4,11 +4,11 @@ using System.Text;
 using System.Drawing;
 using PH.Common;
 
-namespace AASMAHoshimi.ReactiveAgents
+namespace AASMAHoshimi.ReactiveCommunicativeAgents
 {
     //this is an explorer that does not move much (not much of a good explorer) but is a mouthfull
     [Characteristics(ContainerCapacity = 0, CollectTransfertSpeed = 0, Scan = 30, MaxDamage = 0, DefenseDistance = 0, Constitution = 10)]
-    public class ReactiveExplorer : AASMAExplorer
+    public class ReactiveCommunicativeExplorer : AASMAExplorer
     {
         private List<Point> hoshimiesBroadcasted = new List<Point>();
         private List<Point> navPointVisited = new List<Point>();

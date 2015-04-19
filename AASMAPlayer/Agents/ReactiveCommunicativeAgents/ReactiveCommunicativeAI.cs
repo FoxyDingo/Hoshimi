@@ -7,13 +7,13 @@ using System.Drawing;
 using PH.Common;
 using AASMAHoshimi;
 using AASMAHoshimi.Examples;
-using AASMAHoshimi.ReactiveAgents;
+using AASMAHoshimi.ReactiveCommunicativeAgents;
 
 
 
-namespace AASMAHoshimi.Examples
+namespace AASMAHoshimi.ReactiveCommunicativeAgents
 {
-    public class ReactiveAI : AASMAAI
+    public class ReactiveCommunicativeAI : AASMAAI
     {
         private List<Point> hoshimiesPoint = new List<Point>();
         private List<Point> hoshimiesNeedle = new List<Point>();
@@ -32,7 +32,7 @@ namespace AASMAHoshimi.Examples
             set { _objPoint = value; }
         }*/
 
-        public ReactiveAI(NanoAI nanoAI)
+        public ReactiveCommunicativeAI(NanoAI nanoAI)
             : base(nanoAI)
         {
         }
@@ -86,13 +86,13 @@ namespace AASMAHoshimi.Examples
             if (getAASMAFramework().explorersAlive() < 5 && this._nanoAI.State == NanoBotState.WaitingOrders)
             {
                 getAASMAFramework().logData(this._nanoAI, "Building EXPLORER " + this._explorerNumber);
-                this._nanoAI.Build(typeof(ReactiveExplorer), "E" + this._explorerNumber++);
+                this._nanoAI.Build(typeof(ReactiveCommunicativeExplorer), "E" + this._explorerNumber++);
             }
 
             if (getAASMAFramework().protectorsAlive() < 5 && this._nanoAI.State == NanoBotState.WaitingOrders)
             {
                 getAASMAFramework().logData(this._nanoAI, "Building PROTECTOR " + this._protectorNumber);
-                this._nanoAI.Build(typeof(ReactiveProtector), "P" + this._protectorNumber++);
+                this._nanoAI.Build(typeof(ReactiveCommunicativeProtector), "P" + this._protectorNumber++);
                 
                 
             }
@@ -104,7 +104,7 @@ namespace AASMAHoshimi.Examples
             if (getAASMAFramework().containersAlive() < 3 && this._nanoAI.State == NanoBotState.WaitingOrders)
             {
                 getAASMAFramework().logData(this._nanoAI, "Building CONTAINER " + this._containerNumber);
-                this._nanoAI.Build(typeof(ReactiveContainer), "C" + this._containerNumber++);
+                this._nanoAI.Build(typeof(ReactiveCommunicativeContainer), "C" + this._containerNumber++);
                 if (getAASMAFramework().containersAlive() == 2) { _containersCreated = true; }
 
             }
@@ -114,7 +114,7 @@ namespace AASMAHoshimi.Examples
             if (hoshimiesPoint.Count > 0 && getNanoBot().State == NanoBotState.WaitingOrders && getNanoBot().Location.Equals(hoshimiesPoint[0]))
             {
                 getAASMAFramework().logData(this._nanoAI, "Building NEEDLE ");
-                this._nanoAI.Build(typeof(ReactiveNeedle), "N" + this._needleNumber++);
+                this._nanoAI.Build(typeof(ReactiveCommunicativeNeedle), "N" + this._needleNumber++);
                 hoshimiesNeedle.Add(hoshimiesPoint[0]);
 
                 //Sends message to container with needle position

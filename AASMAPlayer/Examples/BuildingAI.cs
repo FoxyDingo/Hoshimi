@@ -26,7 +26,7 @@ namespace AASMAHoshimi.Examples
                 //if u don't want to give a name to the nanobot use the following constructor instead
                 //this._nanoAi.Build(typeof(ForwardExplorer));
                 //however, if you do this, you won't be able to send him personal messages
-                this._nanoAI.Build(typeof(ReactiveExplorer), "E" + this._explorerNumber++);
+                this._nanoAI.Build(typeof(CommunicativeExplorer), "E" + this._explorerNumber++);
             }
         }
 

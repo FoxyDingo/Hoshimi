@@ -3,16 +3,18 @@ using PH.Common;
 using PH.Map;
 using System.Collections.Generic;
 using System.Drawing;
+using AASMAHoshimi.Examples;
+
 
 using AASMAHoshimi;
 
-namespace AASMAHoshimi.Examples
+namespace AASMAHoshimi.ReactiveCommunicativeAgents
 {
     [Characteristics(ContainerCapacity = 100, CollectTransfertSpeed = 0, Scan = 10, MaxDamage = 5, DefenseDistance = 10, Constitution = 25)]
-    public class ReactiveNeedle : AASMANeedle
+    public class ReactiveCommunicativeNeedle : AASMANeedle
     {
         ReactiveAgent agent = new ReactiveAgent();
-        public ReactiveNeedle()
+        public ReactiveCommunicativeNeedle()
         {
             // Shoots a pierre nanobot
             // it shoots one of them, may not be the closest one

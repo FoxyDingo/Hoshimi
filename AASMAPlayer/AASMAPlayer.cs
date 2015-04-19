@@ -6,6 +6,7 @@ using System.Diagnostics;
 using PH.Common;
 using PH.Map;
 using AASMAHoshimi.Examples;
+using AASMAHoshimi.ReactiveCommunicativeAgents;
 using AASMAHoshimi.ReactiveAgents;
 
 namespace AASMAHoshimi

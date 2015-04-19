@@ -66,14 +66,19 @@
   <ItemGroup>
     <Compile Include="AASMAMessage.cs" />
     <Compile Include="AASMAPlayer.cs" />
+    <Compile Include="Agents\ReactiveAgents\ReactiveAI.cs" />
+    <Compile Include="Agents\ReactiveAgents\ReactiveContainer.cs" />
+    <Compile Include="Agents\ReactiveAgents\ReactiveExplorer.cs" />
+    <Compile Include="Agents\ReactiveAgents\ReactiveNeedle.cs" />
+    <Compile Include="Agents\ReactiveAgents\ReactiveProtector.cs" />
     <Compile Include="Examples\BuildingAI.cs" />
     <Compile Include="Examples\CommunicativeExplorer.cs" />
-    <Compile Include="ReactiveAgents\ReactiveProtector.cs" />
-    <Compile Include="ReactiveAgents\Perception.cs" />
-    <Compile Include="ReactiveAgents\ReactiveAgent.cs" />
-    <Compile Include="ReactiveAgents\ReactiveAI.cs" />
-    <Compile Include="ReactiveAgents\ReactiveContainer.cs" />
-    <Compile Include="ReactiveAgents\ReactiveExplorer.cs" />
+    <Compile Include="Agents\ReactiveCommunicativeAgents\ReactiveCommunicativeProtector.cs" />
+    <Compile Include="Agents\Perception.cs" />
+    <Compile Include="Agents\ReactiveAgent.cs" />
+    <Compile Include="Agents\ReactiveCommunicativeAgents\ReactiveCommunicativeAI.cs" />
+    <Compile Include="Agents\ReactiveCommunicativeAgents\ReactiveCommunicativeContainer.cs" />
+    <Compile Include="Agents\ReactiveCommunicativeAgents\ReactiveCommunicativeExplorer.cs" />
     <Compile Include="Examples\PassiveContainer.cs" />
     <Compile Include="Examples\ForwardExplorer.cs" />
     <Compile Include="Examples\PassiveNeedle.cs" />
@@ -91,7 +96,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ReactiveAgents\ReactiveNeedle.cs" />
+    <Compile Include="Agents\ReactiveCommunicativeAgents\ReactiveCommunicativeNeedle.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
