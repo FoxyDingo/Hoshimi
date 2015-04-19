@@ -106,8 +106,18 @@ namespace AASMAHoshimi.Examples
                 getAASMAFramework().logData(this._nanoAI, "Building needle ");
                 this._nanoAI.Build(typeof(ReactiveNeedle), "N" + this._needleNumber++);
                 hoshimiesNeedle.Add(hoshimiesPoint[0]);
+
+                //Sends message to container with needle position
+                for (int i = 0; i < this.getAASMAFramework().NanoBots.Count; i++)
+                {
+                    if (this.getAASMAFramework().NanoBots[i].InternalName.StartsWith("C"))
+                    {
+                        AASMAMessage msg = new AASMAMessage("AI", "Needle Position");
+                        msg.Tag = hoshimiesPoint[0];
+                        getAASMAFramework().sendMessage(msg, this.getAASMAFramework().NanoBots[i].InternalName);
+                    }
+                }       
                 hoshimiesPoint.RemoveAt(0);
-                
             }
 
             //GO TO HOSHIMI POINT

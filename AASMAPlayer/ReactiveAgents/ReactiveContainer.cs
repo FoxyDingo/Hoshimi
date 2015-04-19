@@ -12,14 +12,16 @@ namespace AASMAHoshimi.ReactiveAgents
     class ReactiveContainer : AASMAContainer
     {
         private List<Point> aznPointToVisit = new List<Point>();
-        Point aznPoint = new Point();
-        bool _moving = false;
+        private List<Point> needlesPoints = new List<Point>();
+        private Point aznPoint = new Point();
+        private bool _moving = false;
+        private bool _full = false;
      
 
 
         public override void DoActions()
         {
-            if (_moving == false && aznPointToVisit.Count > 0)
+            if (_moving == false && aznPointToVisit.Count > 0 && _full == false)
             {
                 getAASMAFramework().logData(this, "new route");
                 aznPoint = aznPointToVisit[0];
@@ -28,7 +30,7 @@ namespace AASMAHoshimi.ReactiveAgents
                 _moving = true;
             }
             //Stops if reaches location of azn point
-            if ( aznPoint != null  && Location.Equals(aznPoint) && _moving == true)
+            if ( aznPoint != null  && Location.Equals(aznPoint) && _moving == true && _full == false)
             {
                 getAASMAFramework().logData(this, "stop at azn point");
                 this.StopMoving();
@@ -37,18 +39,29 @@ namespace AASMAHoshimi.ReactiveAgents
 
             //stock is the ammount of azn the collector already has. If full, there is no point in collecting more azn.
             //the overAZN method checks if the received nanobot is over an AZN point
-            if (Stock < ContainerCapacity && this.getAASMAFramework().overAZN(this) && _moving == false)
+            if (Stock < ContainerCapacity && this.getAASMAFramework().overAZN(this) && _moving == false && _full == false)
             {
                 //Debbug
                 getAASMAFramework().logData(this, "collecting azn...");
                 this.collectAZN();
             }
-           
-            //Receive needle position, go to position if is full
-            /*if( Stock > 0 && this.getAASMAFramework().overEmptyNeedle(this))
+
+            if (Stock == 50 && needlesPoints.Count > 0 && _full == false )
+            {
+                getAASMAFramework().logData(this, "I'm full!! Going to needle");
+                this.MoveTo(needlesPoints[0]);
+                _moving = true;
+                _full = true;
+            }
+
+            if (_full == true && Location.Equals(needlesPoints[0]))
             {
                 this.transferAZN();
-            }*/
+                needlesPoints.RemoveAt(0);
+                _full = false;
+                _moving = false;
+            }
+           
         }
 
         public override void receiveMessage(AASMAMessage msg)
@@ -74,13 +87,24 @@ namespace AASMAHoshimi.ReactiveAgents
                     {
                         aznPointToVisit.Remove(p);
                     }
-                    if(aznPoint.Equals(p) && _moving == true )
+                    if(aznPoint.Equals(p) && _moving == true && _full == false)
                     {
                         _moving= false;
                         this.StopMoving();
                     }
 
                 }
+
+                if (msg.Content.Equals("Needle Position"))
+                {
+                    getAASMAFramework().logData(this, "needle position received from IA");
+                    Point p = (Point)msg.Tag;
+                    if (!needlesPoints.Contains(p))
+                    {
+                        needlesPoints.Add(p);
+                    }     
+                }
+
                 
             }catch (Exception e)
             {
