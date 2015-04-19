@@ -25,6 +25,8 @@ namespace AASMAHoshimi.ReactiveAgents
         public override void DoActions()
         {
             List<Point> points;
+            List<Point> aznPoints;
+
 
            //Tells containers the azn positions found 
             points = this.getAASMAFramework().visibleAznPoints(this);
@@ -48,6 +50,7 @@ namespace AASMAHoshimi.ReactiveAgents
                         }
                         //We only want to send one point at a time
                         break;
+
                     }
                 }
             }
