@@ -13,29 +13,41 @@ namespace AASMAHoshimi.ReactiveAgents
         private List<Point> hoshimiesBroadcasted = new List<Point>();
         private List<Point> navPointVisited = new List<Point>();
         private List<Point> navPointBroadcasted = new List<Point>();
+        private List<Point> aznPointBroadcasted = new List<Point>();
         //this is only used to stop the explorer from going to a previously explored navPoint
         private List<Point> _movingToNavPoint = new List<Point>();
         private bool _hasHoshimies = false;
         //Value from 0 to 20; The higher the value the more likely the agent is to not following the other agents
         private int percentageDefect = 15;
+        private bool _containersCreated = false;
 
 
         public override void DoActions()
         {
             List<Point> points;
 
-           //Tells containers the azn positions found
-            if (this.getAASMAFramework().overAZN(this))
+           //Tells containers the azn positions found 
+            points = this.getAASMAFramework().visibleAznPoints(this);
+            if (points.Count > 0 && _containersCreated)
             {
-                getAASMAFramework().logData(this, "AZN POINT FOUND");
-                for (int i = 0; i < this.getAASMAFramework().NanoBots.Count; i++)
+                foreach (Point p in points)
                 {
-                    //getAASMAFramework().logData(this, "NANO NAME: " + this.getAASMAFramework().NanoBots[i].InternalName);
-                    if( this.getAASMAFramework().NanoBots[i].InternalName.StartsWith("C"))
+                    if (!aznPointBroadcasted.Contains(p))
                     {
-                        AASMAMessage msg = new AASMAMessage(this.InternalName, "I've visited a AZN POINT");
-                        msg.Tag = Location;
-                        getAASMAFramework().sendMessage(msg,this.getAASMAFramework().NanoBots[i].InternalName);
+                        getAASMAFramework().logData(this, "AZN POINT FOUND");
+                        aznPointBroadcasted.Add(p);
+                        for (int i = 0; i < this.getAASMAFramework().NanoBots.Count; i++)
+                        {
+                            //getAASMAFramework().logData(this, "NANO NAME: " + this.getAASMAFramework().NanoBots[i].InternalName);
+                            if (this.getAASMAFramework().NanoBots[i].InternalName.StartsWith("C"))
+                            {
+                                AASMAMessage msg = new AASMAMessage(this.InternalName, "I've found an AZN POINT");
+                                msg.Tag = p;
+                                getAASMAFramework().sendMessage(msg, this.getAASMAFramework().NanoBots[i].InternalName);
+                            }
+                        }
+                        //We only want to send one point at a time
+                        break;
                     }
                 }
             }
@@ -177,10 +189,11 @@ namespace AASMAHoshimi.ReactiveAgents
                         navPointVisited.Add(p);
                     }
                 }
+           }
 
-
-                
-                
+            if (msg.Content.Equals("I've created all containers"))
+            {
+                _containersCreated = true;
             }
 
         }

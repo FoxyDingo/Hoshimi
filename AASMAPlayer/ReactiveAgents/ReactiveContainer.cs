@@ -68,9 +68,9 @@ namespace AASMAHoshimi.Examples
 
             try
             {
-                if (msg.Content.Equals("I've visited a AZN POINT"))
+                if (msg.Content.Equals("I've found an AZN POINT"))
                 {
-                    getAASMAFramework().logData(this, "somebody visited a azn point");
+                    getAASMAFramework().logData(this, "somebody found a azn point");
                     Point p = (Point)msg.Tag;
                     if (!aznPoint.Equals(p) && !aznPointToVisit.Contains(p))
                     {

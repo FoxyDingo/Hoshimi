@@ -22,6 +22,7 @@ namespace AASMAHoshimi.Examples
         private bool _distributeNavPointMov = false;
         private Point _pointToDistributeMov;
         private string _pointToDistributeMovName;
+        private bool _containersCreated = false;
         //private bool _hasObj = false;
         //private Object _objPoint;
 
@@ -35,45 +36,49 @@ namespace AASMAHoshimi.Examples
             : base(nanoAI)
         {
         }
+
+        //Sends msg to all nanobots of type s (E, C, P...)
+       public void sendToAll(AASMAMessage msg, string s)
+        {
+            foreach(NanoBot n in getAASMAFramework().NanoBots)
+            {
+                if (n.InternalName.StartsWith(s))
+                {
+                    getAASMAFramework().sendMessage(msg, n.InternalName);
+                    getAASMAFramework().logData(this._nanoAI, "sending msg to " + msg.Receiver + " : " + msg.Content);
+                }
+            }
+            
+        }
         
         public override void DoActions()
         {
-
+            if (_containersCreated)
+            {
+                AASMAMessage msg = new AASMAMessage("AI", "I've created all containers");
+                sendToAll(msg, "E");
+            }
+            
             if (_distributeNavPoint)
             {
-                for (int i = 1; i < this._explorerNumber; i++)
-                {
-                    AASMAMessage msg2 = new AASMAMessage("AI", "I've visited a NAVPOINT");
-                    msg2.Tag = _pointToDistribute;
+                    AASMAMessage msg = new AASMAMessage("AI", "I've visited a NAVPOINT");
+                    msg.Tag = _pointToDistribute;
 
-                    string e = "E" + i;
-
-
-                    getAASMAFramework().sendMessage(msg2, e);
-                    //TODO DONT KNOW WHY BUT THIS ONLY WORKS WITH BROADCAST
-                    //getAASMAFramework().broadCastMessage(msg2);
-                    getAASMAFramework().logData(this._nanoAI, "sending msg to " + msg2.Receiver + " : " + msg2.Content);
+                    sendToAll(msg, "E");
+                     _distributeNavPoint = false;
 
                 }
-                _distributeNavPoint = false;
-            }
+               
+            
 
             if (_distributeNavPointMov)
             {
-                for (int i = 1; i < this._explorerNumber; i++)
-                {
-                    AASMAMessage msg2 = new AASMAMessage(_pointToDistributeMovName, "I've found a NAVPOINT! moving...");
-                    msg2.Tag = _pointToDistributeMov;
+                
+                    AASMAMessage msg = new AASMAMessage(_pointToDistributeMovName, "I've found a NAVPOINT! moving...");
+                    msg.Tag = _pointToDistributeMov;
 
-                    string e = "E" + i;
-
-
-                    getAASMAFramework().sendMessage(msg2, e);
-                    
-                    getAASMAFramework().logData(this._nanoAI, "sending msg to " + msg2.Receiver + " : " + msg2.Content);
-
-                }
-                _distributeNavPointMov = false;
+                    sendToAll(msg, "E");
+                    _distributeNavPointMov = false;
             }
 
 
@@ -100,6 +105,7 @@ namespace AASMAHoshimi.Examples
             {
                 getAASMAFramework().logData(this._nanoAI, "Building CONTAINER " + this._containerNumber);
                 this._nanoAI.Build(typeof(ReactiveContainer), "C" + this._containerNumber++);
+                if (getAASMAFramework().containersAlive() == 2) { _containersCreated = true; }
 
             }
 
