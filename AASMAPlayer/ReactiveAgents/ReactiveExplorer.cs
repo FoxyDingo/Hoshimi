@@ -23,19 +23,23 @@ namespace AASMAHoshimi.ReactiveAgents
         public override void DoActions()
         {
             List<Point> points;
+            List<Point> aznPoints;
 
            //Tells containers the azn positions found
-            if (this.getAASMAFramework().overAZN(this))
+            aznPoints = this.getAASMAFramework().visibleAznPoints(this);
+            if (aznPoints.Count > 0)
             {
                 getAASMAFramework().logData(this, "AZN POINT FOUND");
-                for (int i = 0; i < this.getAASMAFramework().NanoBots.Count; i++)
+                foreach (Point p in aznPoints)
                 {
-                    //getAASMAFramework().logData(this, "NANO NAME: " + this.getAASMAFramework().NanoBots[i].InternalName);
-                    if( this.getAASMAFramework().NanoBots[i].InternalName.StartsWith("C"))
+                    for (int i = 0; i < this.getAASMAFramework().NanoBots.Count; i++)
                     {
-                        AASMAMessage msg = new AASMAMessage(this.InternalName, "I've visited a AZN POINT");
-                        msg.Tag = Location;
-                        getAASMAFramework().sendMessage(msg,this.getAASMAFramework().NanoBots[i].InternalName);
+                        if (this.getAASMAFramework().NanoBots[i].InternalName.StartsWith("C"))
+                        {
+                            AASMAMessage msg = new AASMAMessage(this.InternalName, "I've visited a AZN POINT");
+                            msg.Tag = p;
+                            getAASMAFramework().sendMessage(msg, this.getAASMAFramework().NanoBots[i].InternalName);
+                        }
                     }
                 }
             }
