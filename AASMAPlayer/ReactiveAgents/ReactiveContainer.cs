@@ -4,10 +4,9 @@ using System.Text;
 using PH.Common;
 using System.Drawing;
 
-namespace AASMAHoshimi.ReactiveAgents
+namespace AASMAHoshimi.Examples
 {
-    //this is an example of a stupid collector that does not move, however if he is under an AZN point he will try to collect
-    //something
+    
     [Characteristics(ContainerCapacity = 50, CollectTransfertSpeed = 5, Scan = 0, MaxDamage = 0, DefenseDistance = 0, Constitution = 15)]
     class ReactiveContainer : AASMAContainer
     {
@@ -21,7 +20,7 @@ namespace AASMAHoshimi.ReactiveAgents
 
         public override void DoActions()
         {
-            if (_moving == false && aznPointToVisit.Count > 0 && _full == false)
+           if (_moving == false && aznPointToVisit.Count > 0 && _full == false)
             {
                 getAASMAFramework().logData(this, "new route");
                 aznPoint = aznPointToVisit[0];
