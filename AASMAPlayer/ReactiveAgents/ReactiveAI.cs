@@ -78,23 +78,27 @@ namespace AASMAHoshimi.Examples
 
 
             
-            if (getAASMAFramework().explorersAlive() < 5)
+            if (getAASMAFramework().explorersAlive() < 5 && this._nanoAI.State == NanoBotState.WaitingOrders)
             {
+                getAASMAFramework().logData(this._nanoAI, "Building EXPLORER " + this._explorerNumber);
                 this._nanoAI.Build(typeof(ReactiveExplorer), "E" + this._explorerNumber++);
             }
-            
-            if (getAASMAFramework().protectorsAlive() < 5)
+
+            if (getAASMAFramework().protectorsAlive() < 5 && this._nanoAI.State == NanoBotState.WaitingOrders)
             {
+                getAASMAFramework().logData(this._nanoAI, "Building PROTECTOR " + this._protectorNumber);
                 this._nanoAI.Build(typeof(ReactiveProtector), "P" + this._protectorNumber++);
+                
+                
             }
 
 
             
 
             //builds one nanobot of the type Container
-            if (getAASMAFramework().containersAlive() < 3)
+            if (getAASMAFramework().containersAlive() < 3 && this._nanoAI.State == NanoBotState.WaitingOrders)
             {
-                getAASMAFramework().logData(this._nanoAI, "Building container");
+                getAASMAFramework().logData(this._nanoAI, "Building CONTAINER " + this._containerNumber);
                 this._nanoAI.Build(typeof(ReactiveContainer), "C" + this._containerNumber++);
 
             }
@@ -103,7 +107,7 @@ namespace AASMAHoshimi.Examples
             //BUILD NEEDLE ON HOSHIMI POINT
             if (hoshimiesPoint.Count > 0 && getNanoBot().State == NanoBotState.WaitingOrders && getNanoBot().Location.Equals(hoshimiesPoint[0]))
             {
-                getAASMAFramework().logData(this._nanoAI, "Building needle ");
+                getAASMAFramework().logData(this._nanoAI, "Building NEEDLE ");
                 this._nanoAI.Build(typeof(ReactiveNeedle), "N" + this._needleNumber++);
                 hoshimiesNeedle.Add(hoshimiesPoint[0]);
 
@@ -123,6 +127,10 @@ namespace AASMAHoshimi.Examples
             //GO TO HOSHIMI POINT
             if (hoshimiesPoint.Count > 0 && getNanoBot().State == NanoBotState.WaitingOrders)
             {
+                foreach (NanoBot n in getAASMAFramework().NanoBots)
+                {
+                    getAASMAFramework().logData(this._nanoAI, "Name: " + n.InternalName);
+                }
                 
                 Point p = hoshimiesPoint[0];
                 //getAASMAFramework().logData(this._nanoAI, "I wanna move " );
