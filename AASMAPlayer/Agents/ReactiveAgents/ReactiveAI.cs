@@ -44,7 +44,7 @@ namespace AASMAHoshimi.ReactiveAgents
 
 
             //builds one nanobot of the type Container
-            if (getAASMAFramework().containersAlive() < 3 && this._nanoAI.State == NanoBotState.WaitingOrders)
+            if (getAASMAFramework().containersAlive() < 10 && this._nanoAI.State == NanoBotState.WaitingOrders)
             {
                 getAASMAFramework().logData(this._nanoAI, "Building CONTAINER " + this._containerNumber);
                 this._nanoAI.Build(typeof(ReactiveContainer), "C" + this._containerNumber++);
