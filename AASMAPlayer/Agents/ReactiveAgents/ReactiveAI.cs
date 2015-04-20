@@ -15,8 +15,7 @@ namespace AASMAHoshimi.ReactiveAgents
 {
     public class ReactiveAI : AASMAAI
     {
-        private List<Point> hoshimiesPoint = new List<Point>();
-        private List<Point> hoshimiesNeedle = new List<Point>();
+        
              
         public ReactiveAI(NanoAI nanoAI)
             : base(nanoAI)
@@ -25,6 +24,7 @@ namespace AASMAHoshimi.ReactiveAgents
 
         public override void DoActions()
         {
+            List<Point> points = new List<Point>();
                        
             if (getAASMAFramework().explorersAlive() < 5 && this._nanoAI.State == NanoBotState.WaitingOrders)
             {
@@ -40,9 +40,6 @@ namespace AASMAHoshimi.ReactiveAgents
 
             }
 
-
-
-
             //builds one nanobot of the type Container
             if (getAASMAFramework().containersAlive() < 10 && this._nanoAI.State == NanoBotState.WaitingOrders)
             {
@@ -54,36 +51,19 @@ namespace AASMAHoshimi.ReactiveAgents
 
 
             //BUILD NEEDLE ON HOSHIMI POINT
-            if (hoshimiesPoint.Count > 0 && getNanoBot().State == NanoBotState.WaitingOrders && getNanoBot().Location.Equals(hoshimiesPoint[0]))
+            if (getNanoBot().State == NanoBotState.WaitingOrders && getAASMAFramework().overHoshimiPoint(this._nanoAI) && !getAASMAFramework().overNeedle(this.getNanoBot()))
             {
                 getAASMAFramework().logData(this._nanoAI, "Building NEEDLE ");
                 this._nanoAI.Build(typeof(ReactiveNeedle), "N" + this._needleNumber++);
-                hoshimiesNeedle.Add(hoshimiesPoint[0]);
-                                
-                hoshimiesPoint.RemoveAt(0);
             }
 
             //GO TO HOSHIMI POINT
-            if (hoshimiesPoint.Count > 0 && getNanoBot().State == NanoBotState.WaitingOrders)
+            points = getAASMAFramework().visibleHoshimies(this.getNanoBot());
+            if (points.Count > 0 && getNanoBot().State == NanoBotState.WaitingOrders)
             {
-                foreach (NanoBot n in getAASMAFramework().NanoBots)
-                {
-                    getAASMAFramework().logData(this._nanoAI, "Name: " + n.InternalName);
-                }
-
-                Point p = hoshimiesPoint[0];
+                Point p = Utils.getNearestPoint(this.getNanoBot().Location, points);
                 //getAASMAFramework().logData(this._nanoAI, "I wanna move " );
                 getNanoBot().MoveTo(p);
-            }
-
-            //IF HE SEES AN HOSHIMI POINT ADD IT TO THE LIST
-            List<Point> points = getAASMAFramework().visibleHoshimies(getNanoBot());
-            if (points.Count > 0)
-            {
-                if (!hoshimiesNeedle.Contains(points[0]) && !hoshimiesPoint.Contains(points[0]))
-                {
-                    hoshimiesPoint.Add(points[0]);
-                }
             }
 
             //MOVE RANDOMLY

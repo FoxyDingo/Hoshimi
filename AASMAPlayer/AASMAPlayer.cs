@@ -6,7 +6,7 @@ using System.Diagnostics;
 using PH.Common;
 using PH.Map;
 using AASMAHoshimi.Examples;
-using AASMAHoshimi.ReactiveCommunicativeAgents;
+using AASMAHoshimi.ISCommunicativeAgents;
 using AASMAHoshimi.ReactiveAgents;
 
 namespace AASMAHoshimi
@@ -42,7 +42,7 @@ namespace AASMAHoshimi
         
         public virtual AASMAAI buildAIAgent(NanoAI nanoAI)
         {
-            return new ReactiveCommunicativeAI(nanoAI);
+            return new ReactiveAI(nanoAI);
         }
 
         #region AASMA_STUDENTS-DO_NOT_CHANGE_ANYTHING_HERE

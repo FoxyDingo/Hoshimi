@@ -11,37 +11,60 @@ namespace AASMAHoshimi.ReactiveAgents
     public class ReactiveExplorer : AASMAExplorer
     {
        
-        private List<Point> navPointVisited = new List<Point>();
-      
-       
-        //this is only used to stop the explorer from going to a previously explored navPoint
-        private List<Point> _movingToNavPoint = new List<Point>();
-        
-       
-
-
         public override void DoActions()
         {
             List<Point> points;
-                                           
+            
+            //Move away from nav point
+            points = getAASMAFramework().visibleNavigationPoints(this);
+            if(points.Count > 0 && this.Location.Equals(Utils.getNearestPoint(this.Location, points)) &&  this.State == NanoBotState.WaitingOrders)
+            {
+                Point obj = this.Location;
+                getAASMAFramework().logData(this, "FINDING A NEW POINT");
+                int rnd = Utils.randomValue(5);
+                if(rnd == 0){
+                    Point p = this.Location;
+                    p.X = p.X + this.Scan + (this.Scan / 2);
+                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
+                }
+                if(rnd == 1){
+                    Point p = this.Location;
+                    p.X = p.X - this.Scan + (this.Scan / 2);
+                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
+                }
+                if(rnd == 2) {
+                    Point p = this.Location;
+                    p.Y = p.Y - this.Scan + (this.Scan / 2);
+                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
+                }
+                if(rnd == 3){
+                    Point p = this.Location;
+                    p.Y = p.Y + this.Scan + (this.Scan / 2);
+                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
+                }
+                if (rnd == ~4)
+                {
+                    Point p = this.Location;
+                    p.Y = p.Y + this.Scan + (this.Scan / 2);
+                    p.X = p.X + this.Scan + (this.Scan / 2);
+                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
+                }
+                if (rnd == 5)
+                {
+                    Point p = this.Location;
+                    p.Y = p.Y - this.Scan + (this.Scan / 2);
+                    p.X = p.X - this.Scan + (this.Scan / 2);
+                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
+                }
+                this.MoveTo(obj);
+            }
+            
+       
             // GO TO NAV POINT
             points = getAASMAFramework().visibleNavigationPoints(this);
-            if (points.Count > 0 )
+            if (points.Count > 0 && this.State == NanoBotState.WaitingOrders)
             {
-
-                foreach (Point p in points)
-                {
-                    if (_movingToNavPoint.Count == 0 && !navPointVisited.Contains(p))
-                    {
-                        
-                        this._movingToNavPoint.Add(p);
-                        this.MoveTo(p);
-                        break;
-                    }
-
-
-                }
-
+                this.MoveTo(Utils.getNearestPoint(this.Location, points));
             }
 
             //MOVE RANDOMLY

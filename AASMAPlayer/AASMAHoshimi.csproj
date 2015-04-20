@@ -73,12 +73,12 @@
     <Compile Include="Agents\ReactiveAgents\ReactiveProtector.cs" />
     <Compile Include="Examples\BuildingAI.cs" />
     <Compile Include="Examples\CommunicativeExplorer.cs" />
-    <Compile Include="Agents\ReactiveCommunicativeAgents\ReactiveCommunicativeProtector.cs" />
+    <Compile Include="Agents\ISCommunicativeAgents\ISCommunicativeProtector.cs" />
     <Compile Include="Agents\Perception.cs" />
     <Compile Include="Agents\ReactiveAgent.cs" />
-    <Compile Include="Agents\ReactiveCommunicativeAgents\ReactiveCommunicativeAI.cs" />
-    <Compile Include="Agents\ReactiveCommunicativeAgents\ReactiveCommunicativeContainer.cs" />
-    <Compile Include="Agents\ReactiveCommunicativeAgents\ReactiveCommunicativeExplorer.cs" />
+    <Compile Include="Agents\ISCommunicativeAgents\ISCommunicativeAI.cs" />
+    <Compile Include="Agents\ISCommunicativeAgents\ISCommunicativeContainer.cs" />
+    <Compile Include="Agents\ISCommunicativeAgents\ISCommunicativeExplorer.cs" />
     <Compile Include="Examples\PassiveContainer.cs" />
     <Compile Include="Examples\ForwardExplorer.cs" />
     <Compile Include="Examples\PassiveNeedle.cs" />
@@ -96,7 +96,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Agents\ReactiveCommunicativeAgents\ReactiveCommunicativeNeedle.cs" />
+    <Compile Include="Agents\ISCommunicativeAgents\ISCommunicativeNeedle.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +130,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "C:\fdk\Mestrado\AASMA\hoshimi\PH2007SDK\players" /y</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
