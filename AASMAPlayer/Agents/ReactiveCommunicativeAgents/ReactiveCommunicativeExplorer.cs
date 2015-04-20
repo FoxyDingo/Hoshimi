@@ -14,6 +14,7 @@ namespace AASMAHoshimi.ReactiveCommunicativeAgents
         private List<Point> navPointVisited = new List<Point>();
         private List<Point> navPointBroadcasted = new List<Point>();
         private List<Point> aznPointBroadcasted = new List<Point>();
+        private List<Point> aznPointsTemp = new List<Point>();
         //this is only used to stop the explorer from going to a previously explored navPoint
         private List<Point> _movingToNavPoint = new List<Point>();
         private bool _hasHoshimies = false;
@@ -25,7 +26,7 @@ namespace AASMAHoshimi.ReactiveCommunicativeAgents
         public override void DoActions()
         {
             List<Point> points;
-            List<Point> aznPoints;
+            
 
 
            //Tells containers the azn positions found 

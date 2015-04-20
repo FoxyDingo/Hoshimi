@@ -12,21 +12,30 @@ namespace AASMAHoshimi.ReactiveCommunicativeAgents
     [Characteristics(ContainerCapacity = 50, CollectTransfertSpeed = 5, Scan = 0, MaxDamage = 0, DefenseDistance = 0, Constitution = 15)]
     class ReactiveCommunicativeContainer : AASMAContainer
     {
-        private List<Point> aznPointToVisit = new List<Point>();
-        private List<Point> needlesPoints = new List<Point>();
-        private Point aznPoint = new Point();
+        private List<Point> aznPoints = new List<Point>();
+        private List<Point> needlePoints = new List<Point>();
+        
 
         public override void DoActions()
         {
-            List<Point> aznPoints;
-            List<Point> emptyNeedlePoints;
-            List<Point> fullNeedlePoints;
-
-            //stock is the ammount of azn the collector already has. If full, there is no point in collecting more azn.
-            //the overAZN method checks if the received nanobot is over an AZN point
-            if (this.State == NanoBotState.WaitingOrders && Stock < ContainerCapacity && this.getAASMAFramework().overAZN(this))
+            List<Point> points;
+            //DELETE FULL NEEDLE FROM LIST
+            points = getAASMAFramework().visibleFullNeedles(this);
+            if (points.Count > 0)
             {
-                getAASMAFramework().logData(this, "collecting azn...");
+                foreach (Point p in points)
+                {
+                    if (needlePoints.Contains(p))
+                    {
+                        needlePoints.Remove(p);
+                    }
+                }
+            }
+
+            //Collect AZN
+            if (this.State == NanoBotState.WaitingOrders && getAASMAFramework().overAZN(this) && Stock < ContainerCapacity)
+            {
+                getAASMAFramework().logData(this, "collecting azn");
                 this.collectAZN();
             }
 
@@ -34,68 +43,69 @@ namespace AASMAHoshimi.ReactiveCommunicativeAgents
             if (this.State == NanoBotState.WaitingOrders && getAASMAFramework().overEmptyNeedle(this) && Stock > 0)
             {
                 getAASMAFramework().logData(this, "transfer azn to needle");
-                if (Location.Equals(needlesPoints[0]))
-                {
-                    this.transferAZN();
-                }
+                this.transferAZN();
+                
             }
 
-            //goes to an azn point to visit waiting
-            if (Stock == 0 && aznPointToVisit.Count > 0)
+            //GO TO azn POINT
+            points = getAASMAFramework().visibleAznPoints(this);
+            if (Stock == 0 && (points.Count > 0 || aznPoints.Count > 0))
             {
                 getAASMAFramework().logData(this, "new route");
-                aznPoint = aznPointToVisit[0];
-                //aznPointToVisit.RemoveAt(0);
-                this.MoveTo(aznPoint);
+                List<Point> temp = new List<Point>(points);
+                temp.AddRange(aznPoints);
+                Point nearest = Utils.getNearestPoint(this.Location, temp);
+                this.MoveTo(nearest);
             }
 
-            //has needle to tranfer, goes there
-            if (Stock == ContainerCapacity && this.State == NanoBotState.WaitingOrders && Stock > 0 && aznPointToVisit.Count > 0)
+            //Go to needle
+            points = getAASMAFramework().visibleEmptyNeedles(this);
+            if (this.State == NanoBotState.WaitingOrders && Stock > 0 && (points.Count > 0 || needlePoints.Count > 0))
             {
-                if (needlesPoints.Count > 0)
+                getAASMAFramework().logData(this, "Going to needle");
+                //We dont know if the needlePoints are still Empty so we prefer to go to the points location
+                if (points.Count > 0)
                 {
-                    getAASMAFramework().logData(this, "I'm full!! Going to needle");
-                    this.MoveTo(needlesPoints[0]);
+                    Point p = Utils.getNearestPoint(this.Location, points);
+                    this.MoveTo(p);
+
                 }
+                else if (needlePoints.Count > 0)
+                {
+                    Point p = Utils.getNearestPoint(this.Location, needlePoints);
+                    this.MoveTo(p);
+                }
+
             }
 
-            if (this.State == NanoBotState.WaitingOrders && Stock > 0 && aznPointToVisit.Count > 0)
+            //SEE azn POINT   
+            points = getAASMAFramework().visibleAznPoints(this);
+            if (points.Count > 0)
             {
-                aznPoints = this.getAASMAFramework().visibleAznPoints(this);
-                emptyNeedlePoints = this.getAASMAFramework().visibleEmptyNeedles(this);
-                fullNeedlePoints = this.getAASMAFramework().visibleFullNeedles(this);
-
-                foreach (Point p in aznPoints)
+                foreach (Point p in points)
                 {
-                    if (!aznPointToVisit.Contains(p))
-                    {
-                        aznPointToVisit.Add(p);
-                    }
+                    if (!aznPoints.Contains(p)) { aznPoints.Add(p); }
                 }
 
-                foreach (Point empty in emptyNeedlePoints)
-                {
-                    if (!needlesPoints.Contains(empty))
-                    {
-                        needlesPoints.Add(empty);
-                    }
-                }
-
-                foreach (Point full in fullNeedlePoints)
-                {
-                    if (needlesPoints.Contains(full))
-                    {
-                        needlesPoints.Remove(full);
-                    }
-                }
             }
 
+            //SEE EMPTY NEEDLE  
+            points = getAASMAFramework().visibleEmptyNeedles(this);
+            if (points.Count > 0)
+            {
+                foreach (Point p in points)
+                {
+                    if (!needlePoints.Contains(p)) { needlePoints.Add(p); }
+                }
+
+            }
+
+            //MOVE RANDOMLY
             if (this.State == NanoBotState.WaitingOrders)
             {
-                getAASMAFramework().logData(this, "moving randomly");
                 if (frontClear())
                 {
-                    if (AASMAHoshimi.Utils.randomValue(100) < 90)
+                    if (Utils.randomValue(100) < 80)
                     {
                         this.MoveForward();
                     }
@@ -116,13 +126,13 @@ namespace AASMAHoshimi.ReactiveCommunicativeAgents
 
             try
             {
-                if (msg.Content.Equals("I've visited a AZN POINT"))
+                if (msg.Content.Equals("I've found an AZN POINT"))
                 {
-                    getAASMAFramework().logData(this, "somebody visited a azn point");
+                    getAASMAFramework().logData(this, "somebody found an azn point");
                     Point p = (Point)msg.Tag;
-                    if (!aznPoint.Equals(p) && !aznPointToVisit.Contains(p))
+                    if (!aznPoints.Equals(p))
                     {
-                        aznPointToVisit.Add(p);
+                        aznPoints.Add(p);
                     }
                 }
 
@@ -130,9 +140,9 @@ namespace AASMAHoshimi.ReactiveCommunicativeAgents
                 {
                     getAASMAFramework().logData(this, "needle position received from IA");
                     Point p = (Point)msg.Tag;
-                    if (!needlesPoints.Contains(p))
+                    if (!needlePoints.Contains(p))
                     {
-                        needlesPoints.Add(p);
+                        needlePoints.Add(p);
                     }
                 }
 

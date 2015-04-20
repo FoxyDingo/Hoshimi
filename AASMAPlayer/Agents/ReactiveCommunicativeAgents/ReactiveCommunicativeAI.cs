@@ -57,6 +57,7 @@ namespace AASMAHoshimi.ReactiveCommunicativeAgents
             {
                 AASMAMessage msg = new AASMAMessage("AI", "I've created all containers");
                 sendToAll(msg, "E");
+                _containersCreated = false;
             }
             
             if (_distributeNavPoint)
