@@ -21,41 +21,7 @@ namespace AASMAHoshimi.ReactiveAgents
             {
                 Point obj = this.Location;
                 getAASMAFramework().logData(this, "FINDING A NEW POINT");
-                int rnd = Utils.randomValue(5);
-                if(rnd == 0){
-                    Point p = this.Location;
-                    p.X = p.X + this.Scan + 10 + (this.Scan / 2);
-                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
-                }
-                if(rnd == 1){
-                    Point p = this.Location;
-                    p.X = p.X - this.Scan + 10 + (this.Scan / 2);
-                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
-                }
-                if(rnd == 2) {
-                    Point p = this.Location;
-                    p.Y = p.Y - this.Scan + 10 + (this.Scan / 2);
-                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
-                }
-                if(rnd == 3){
-                    Point p = this.Location;
-                    p.Y = p.Y + this.Scan + 10 + (this.Scan / 2);
-                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
-                }
-                if (rnd == ~4)
-                {
-                    Point p = this.Location;
-                    p.Y = p.Y + this.Scan + 10 + (this.Scan / 2);
-                    p.X = p.X + this.Scan + 10 + (this.Scan / 2);
-                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
-                }
-                if (rnd == 5)
-                {
-                    Point p = this.Location;
-                    p.Y = p.Y - this.Scan + 10 + (this.Scan / 2);
-                    p.X = p.X - this.Scan + 10 + (this.Scan / 2);
-                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
-                }
+                obj = Utils.pointAway(obj, this.Scan, this.PlayerOwner.Tissue);
                 this.MoveTo(obj);
             }
             

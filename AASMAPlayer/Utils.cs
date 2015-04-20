@@ -308,5 +308,41 @@ namespace AASMAHoshimi
             return Utils._randomFactory.Next(0, maximum + 1);
         }
 
+        public static Point pointAway(Point point, int scan, Tissue tissue)
+        {
+            Point p = point;
+            int rnd = Utils.randomValue(2);
+            if (rnd == 0)
+            {
+                p.X = p.X + scan + 10 + (scan / 2);
+            }
+            if (rnd == 1)
+            {
+                p.X = p.X - scan + 10 + (scan / 2);              
+            }
+            if (rnd == 2)
+            {
+                //We dont change X
+            }
+
+            rnd = Utils.randomValue(2);
+
+            if (rnd == 0)
+            {
+                p.Y = p.Y + scan + 10 + (scan / 2);          
+            }
+            if (rnd == 1)
+            {
+                p.Y = p.Y - scan + 10 + (scan / 2);                
+            }
+            if (rnd == 2)
+            {
+                //We dont change Y
+            }
+
+            return Utils.getValidPoint(tissue, p);
+           
+        }
+
     }
 }

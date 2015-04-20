@@ -83,26 +83,24 @@ namespace AASMAHoshimi.ISCommunicativeAgents
             }
 
 
-            
-            if (getAASMAFramework().explorersAlive() < 5 && this._nanoAI.State == NanoBotState.WaitingOrders)
+            if (getAASMAFramework().protectorsAlive() < 10 && this._nanoAI.State == NanoBotState.WaitingOrders)
+            {
+                getAASMAFramework().logData(this._nanoAI, "Building PROTECTOR " + this._protectorNumber);
+                this._nanoAI.Build(typeof(ISCommunicativeProtector), "P" + this._protectorNumber++);
+
+
+            }
+
+            if (getAASMAFramework().explorersAlive() < 10 && this._nanoAI.State == NanoBotState.WaitingOrders)
             {
                 getAASMAFramework().logData(this._nanoAI, "Building EXPLORER " + this._explorerNumber);
                 this._nanoAI.Build(typeof(ISCommunicativeExplorer), "E" + this._explorerNumber++);
             }
 
-            if (getAASMAFramework().protectorsAlive() < 5 && this._nanoAI.State == NanoBotState.WaitingOrders)
-            {
-                getAASMAFramework().logData(this._nanoAI, "Building PROTECTOR " + this._protectorNumber);
-                this._nanoAI.Build(typeof(ISCommunicativeProtector), "P" + this._protectorNumber++);
-                
-                
-            }
-
-
-            
+                       
 
             //builds one nanobot of the type Container
-            if (getAASMAFramework().containersAlive() < 3 && this._nanoAI.State == NanoBotState.WaitingOrders)
+            if (getAASMAFramework().containersAlive() < 5 && this._nanoAI.State == NanoBotState.WaitingOrders)
             {
                 getAASMAFramework().logData(this._nanoAI, "Building CONTAINER " + this._containerNumber);
                 this._nanoAI.Build(typeof(ISCommunicativeContainer), "C" + this._containerNumber++);

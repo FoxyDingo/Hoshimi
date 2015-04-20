@@ -25,14 +25,8 @@ namespace AASMAHoshimi.ReactiveAgents
         public override void DoActions()
         {
             List<Point> points = new List<Point>();
-                       
-            if (getAASMAFramework().explorersAlive() < 5 && this._nanoAI.State == NanoBotState.WaitingOrders)
-            {
-                getAASMAFramework().logData(this._nanoAI, "Building EXPLORER " + this._explorerNumber);
-                this._nanoAI.Build(typeof(ReactiveExplorer), "E" + this._explorerNumber++);
-            }
 
-            if (getAASMAFramework().protectorsAlive() < 5 && this._nanoAI.State == NanoBotState.WaitingOrders)
+            if (getAASMAFramework().protectorsAlive() < 10 && this._nanoAI.State == NanoBotState.WaitingOrders)
             {
                 getAASMAFramework().logData(this._nanoAI, "Building PROTECTOR " + this._protectorNumber);
                 this._nanoAI.Build(typeof(ReactiveProtector), "P" + this._protectorNumber++);
@@ -40,59 +34,35 @@ namespace AASMAHoshimi.ReactiveAgents
 
             }
 
+            if (getAASMAFramework().explorersAlive() < 10 && this._nanoAI.State == NanoBotState.WaitingOrders)
+            {
+                getAASMAFramework().logData(this._nanoAI, "Building EXPLORER " + this._explorerNumber);
+                this._nanoAI.Build(typeof(ReactiveExplorer), "E" + this._explorerNumber++);
+            }
+
             //builds one nanobot of the type Container
             if (getAASMAFramework().containersAlive() < 10 && this._nanoAI.State == NanoBotState.WaitingOrders)
             {
                 getAASMAFramework().logData(this._nanoAI, "Building CONTAINER " + this._containerNumber);
                 this._nanoAI.Build(typeof(ReactiveContainer), "C" + this._containerNumber++);
-               
+
 
             }
+
+            
+
+            
+
+            
+
+            
 
             //GO AWAY FROM HOSHIMI WITH NEEDLE
             if (getNanoBot().State == NanoBotState.WaitingOrders && getAASMAFramework().overHoshimiPoint(this._nanoAI) && getAASMAFramework().overNeedle(this.getNanoBot()))
             {
                 Point obj = this._nanoAI.Location;
                 getAASMAFramework().logData(this._nanoAI, "FINDING A NEW POINT");
-                int rnd = Utils.randomValue(5);
-                if (rnd == 0)
-                {
-                    Point p = this._nanoAI.Location;
-                    p.X = p.X + this._nanoAI.Scan + 10 + (this._nanoAI.Scan / 2);
-                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
-                }
-                if (rnd == 1)
-                {
-                    Point p = this._nanoAI.Location;
-                    p.X = p.X - this._nanoAI.Scan + 10 + (this._nanoAI.Scan / 2);
-                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
-                }
-                if (rnd == 2)
-                {
-                    Point p = this._nanoAI.Location;
-                    p.Y = p.Y - this._nanoAI.Scan + 10 + (this._nanoAI.Scan / 2);
-                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
-                }
-                if (rnd == 3)
-                {
-                    Point p = this._nanoAI.Location;
-                    p.Y = p.Y + this._nanoAI.Scan + 10 + (this._nanoAI.Scan / 2);
-                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
-                }
-                if (rnd == ~4)
-                {
-                    Point p = this._nanoAI.Location;
-                    p.Y = p.Y + this._nanoAI.Scan + 10 + (this._nanoAI.Scan / 2);
-                    p.X = p.X + this._nanoAI.Scan + 10 + (this._nanoAI.Scan / 2);
-                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
-                }
-                if (rnd == 5)
-                {
-                    Point p = this._nanoAI.Location;
-                    p.Y = p.Y - this._nanoAI.Scan + 10 + (this._nanoAI.Scan / 2);
-                    p.X = p.X - this._nanoAI.Scan + 10 + (this._nanoAI.Scan / 2);
-                    obj = Utils.getValidPoint(getAASMAFramework().Tissue, p);
-                }
+                obj = Utils.pointAway(obj, this._nanoAI.Scan, this._nanoAI.PlayerOwner.Tissue);
                 this._nanoAI.MoveTo(obj);
             }
             //BUILD NEEDLE ON HOSHIMI POINT
