@@ -1,6 +1,7 @@
 ﻿using System;
 using PH.Common;
 using PH.Map;
+using System.Drawing;
 
 using AASMAHoshimi;
 
@@ -10,6 +11,7 @@ namespace AASMAHoshimi.Examples
     {
         FriendlyBot,
         EnemyBot,
+        HoshimiPoint,
         AZNPoint,
         BloodStream,
         Cell,
@@ -70,11 +72,26 @@ namespace AASMAHoshimi.Examples
     public class AZNPointPerception : Perception
     {
         public const PerceptionType TYPE = PerceptionType.AZNPoint;
-        public AZNPointPerception(Entity obj, double distance) : base(obj, distance) { }
+        public AZNPointPerception(Point obj, double distance) : base(obj, distance) { }
 
-        public Entity getAZNPoint()
+        public Point getAZNPoint()
         {
-            return (Entity)obj;
+            return (Point) obj;
+        }
+        public override PerceptionType getType()
+        {
+            return TYPE;
+        }
+    }
+
+    public class HoshimiPointPerception : Perception
+    {
+        public const PerceptionType TYPE = PerceptionType.HoshimiPoint;
+        public HoshimiPointPerception(Point obj, double distance) : base(obj, distance) { }
+
+        public Point getHoshimiPoint()
+        {
+            return (Point) obj;
         }
         public override PerceptionType getType()
         {

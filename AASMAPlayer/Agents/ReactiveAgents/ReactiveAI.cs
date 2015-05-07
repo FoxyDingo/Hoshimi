@@ -15,95 +15,176 @@ namespace AASMAHoshimi.ReactiveAgents
 {
     public class ReactiveAI : AASMAAI
     {
-        
+        ReactiveAgent agent = new ReactiveAgent();
              
         public ReactiveAI(NanoAI nanoAI)
             : base(nanoAI)
         {
-        }
+            //builds protectors
+            agent.AddRule(
+                delegate(List<Perception> perceptions)
+                {
+                    if (getAASMAFramework().protectorsAlive() < 3 && this._nanoAI.State == NanoBotState.WaitingOrders)
+                    {
+                        return true;
+                    }
+                    return false;
+                },
+                delegate(ReactiveAgent a, List<Perception> perceptions)
+                {
+                    getAASMAFramework().logData(this._nanoAI, "Building PROTECTOR " + this._protectorNumber);
+                    this._nanoAI.Build(typeof(ReactiveProtector), "P" + this._protectorNumber++);
+                }
+            );
 
-        public override void DoActions()
-        {
-            List<Point> points = new List<Point>();
+            //builds explorers
+            agent.AddRule(
+                delegate(List<Perception> perceptions)
+                {
+                    if (getAASMAFramework().explorersAlive() < 3 && this._nanoAI.State == NanoBotState.WaitingOrders)
+                    {
+                        return true;
+                    }
+                    return false;
+                },
+                delegate(ReactiveAgent a, List<Perception> perceptions)
+                {
+                    getAASMAFramework().logData(this._nanoAI, "Building EXPLORER " + this._explorerNumber);
+                    this._nanoAI.Build(typeof(ReactiveExplorer), "E" + this._explorerNumber++);
+                }
+            );
 
-            if (getAASMAFramework().protectorsAlive() < 10 && this._nanoAI.State == NanoBotState.WaitingOrders)
-            {
-                getAASMAFramework().logData(this._nanoAI, "Building PROTECTOR " + this._protectorNumber);
-                this._nanoAI.Build(typeof(ReactiveProtector), "P" + this._protectorNumber++);
-
-
-            }
-
-            if (getAASMAFramework().explorersAlive() < 10 && this._nanoAI.State == NanoBotState.WaitingOrders)
-            {
-                getAASMAFramework().logData(this._nanoAI, "Building EXPLORER " + this._explorerNumber);
-                this._nanoAI.Build(typeof(ReactiveExplorer), "E" + this._explorerNumber++);
-            }
-
-            //builds one nanobot of the type Container
-            if (getAASMAFramework().containersAlive() < 10 && this._nanoAI.State == NanoBotState.WaitingOrders)
-            {
-                getAASMAFramework().logData(this._nanoAI, "Building CONTAINER " + this._containerNumber);
-                this._nanoAI.Build(typeof(ReactiveContainer), "C" + this._containerNumber++);
-
-
-            }
-
-            
-
-            
-
-            
-
-            
-
+            //builds containers
+            agent.AddRule(
+                delegate(List<Perception> perceptions)
+                {
+                    if (getAASMAFramework().containersAlive() < 3 && this._nanoAI.State == NanoBotState.WaitingOrders)
+                    {
+                        return true;
+                    }
+                    return false;
+                },
+                delegate(ReactiveAgent a, List<Perception> perceptions)
+                {
+                    getAASMAFramework().logData(this._nanoAI, "Building CONTAINER " + this._containerNumber);
+                    this._nanoAI.Build(typeof(ReactiveContainer), "C" + this._containerNumber++);
+                }
+            );
+                                      
             //GO AWAY FROM HOSHIMI WITH NEEDLE
-            if (getNanoBot().State == NanoBotState.WaitingOrders && getAASMAFramework().overHoshimiPoint(this._nanoAI) && getAASMAFramework().overNeedle(this.getNanoBot()))
-            {
-                Point obj = this._nanoAI.Location;
-                getAASMAFramework().logData(this._nanoAI, "FINDING A NEW POINT");
-                obj = Utils.pointAway(obj, this._nanoAI.Scan, this._nanoAI.PlayerOwner.Tissue);
-                this._nanoAI.MoveTo(obj);
-            }
+            agent.AddRule(
+                delegate(List<Perception> perceptions)
+                {
+                    if (getNanoBot().State == NanoBotState.WaitingOrders && getAASMAFramework().overHoshimiPoint(this._nanoAI) && getAASMAFramework().overNeedle(this.getNanoBot()))
+                    {
+                        return true;
+                    }
+                    return false;
+                    
+                }, delegate(ReactiveAgent a, List<Perception> perceptions)
+                {
+                    Point obj = this._nanoAI.Location;
+                    getAASMAFramework().logData(this._nanoAI, "FINDING A NEW POINT");
+                    obj = Utils.pointAway(obj, this._nanoAI.Scan, this._nanoAI.PlayerOwner.Tissue);
+                    this._nanoAI.MoveTo(obj);
+                }
+            );
+
             //BUILD NEEDLE ON HOSHIMI POINT
-            if (getNanoBot().State == NanoBotState.WaitingOrders && getAASMAFramework().overHoshimiPoint(this._nanoAI) && !getAASMAFramework().overNeedle(this.getNanoBot()))
-            {
-                getAASMAFramework().logData(this._nanoAI, "Building NEEDLE ");
-                this._nanoAI.Build(typeof(ReactiveNeedle), "N" + this._needleNumber++);
-            }
+            agent.AddRule(
+                delegate(List<Perception> perceptions)
+                {
+                    if (getNanoBot().State == NanoBotState.WaitingOrders && getAASMAFramework().overHoshimiPoint(this._nanoAI) && !getAASMAFramework().overNeedle(this.getNanoBot()))
+                    {
+                        return true;
+                    }
+                    return false;
+
+                }, delegate(ReactiveAgent a, List<Perception> perceptions)
+                {
+                    getAASMAFramework().logData(this._nanoAI, "Building NEEDLE ");
+                    this._nanoAI.Build(typeof(ReactiveNeedle), "N" + this._needleNumber++);
+                }
+            );
 
             //GO TO HOSHIMI POINT
-            points = getAASMAFramework().visibleHoshimies(this.getNanoBot());
-            if (points.Count > 0 && getNanoBot().State == NanoBotState.WaitingOrders)
-            {
-                Point p = Utils.getNearestPoint(this.getNanoBot().Location, points);
-                //getAASMAFramework().logData(this._nanoAI, "I wanna move " );
-                getNanoBot().MoveTo(p);
-            }
+            agent.AddRule(
+                delegate(List<Perception> perceptions)
+                {
+                    
+                    bool foundHosh = false;
+                    if (getNanoBot().State == NanoBotState.WaitingOrders)
+                    {
+                        List<Point> points = new List<Point>();
+                        foreach (var perception in perceptions)
+                        {
+                            
+                            if (perception.isType(PerceptionType.HoshimiPoint))
+                            {
+                                foundHosh = true;
+                                HoshimiPointPerception per = (HoshimiPointPerception)perception;
+                                points.Add(per.getHoshimiPoint());
+                            }
+                        }
+                        Point p = Utils.getNearestPoint(this.getNanoBot().Location, points);
+                        agent.storeTemp(p);
+                        if (foundHosh)
+                        {
+                            getAASMAFramework().logData(this._nanoAI, "I want to go to Hoshimi ");
+                        }
+                        return foundHosh;
+
+                       
+                    }
+                    return false;
+
+                }, delegate(ReactiveAgent a, List<Perception> perceptions)
+                {
+                    Point p = (Point)agent.getTemp();
+                    getAASMAFramework().logData(this._nanoAI, "I am going to hoshimi at " + p.ToString());
+
+                    
+                    getNanoBot().MoveTo(p);
+                }
+            );
 
             //MOVE RANDOMLY
-            if (getNanoBot().State == NanoBotState.WaitingOrders)
-            {
-                if (frontClear())
+            agent.AddRule(
+                delegate(List<Perception> perceptions)
                 {
-                    if (Utils.randomValue(100) < 80)
+                    getAASMAFramework().logData(this._nanoAI, "I want to move randomly ");
+                    if (getNanoBot().State == NanoBotState.WaitingOrders)
                     {
-                        this.MoveForward();
+                        return true;
+                    }
+                    return false;
+
+                }, delegate(ReactiveAgent a, List<Perception> perceptions)
+                {
+                    getAASMAFramework().logData(this._nanoAI, "I am moving randomly ");
+                    if (frontClear())
+                    {
+                        if (Utils.randomValue(100) < 80)
+                        {
+                            this.MoveForward();
+                        }
+                        else
+                        {
+                            this.RandomTurn();
+                        }
                     }
                     else
                     {
                         this.RandomTurn();
                     }
                 }
-                else
-                {
-                    this.RandomTurn();
-                }
+            );
 
-            }
+        }
 
-
-
+        public override void DoActions()
+        {
+            agent.React(agent.getPerceptions(this._nanoAI, this.getAASMAFramework()));
         }
 
 

@@ -12,7 +12,7 @@ namespace AASMAHoshimi.ReactiveAgents
     public class ReactiveNeedle : AASMANeedle
     {
         ReactiveAgent agent = new ReactiveAgent();
-        public ReactiveNeedle()
+        public ReactiveNeedle() : base()
         {
             // Shoots a pierre nanobot
             // it shoots one of them, may not be the closest one
@@ -51,7 +51,7 @@ namespace AASMAHoshimi.ReactiveAgents
 
         public override void DoActions()
         {
-            agent.React(agent.getPerceptions(this));
+            agent.React(agent.getPerceptions(this, this.getAASMAFramework()));
         }
 
         public override void receiveMessage(AASMAMessage msg)

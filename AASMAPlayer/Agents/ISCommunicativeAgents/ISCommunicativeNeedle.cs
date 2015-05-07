@@ -53,7 +53,7 @@ namespace AASMAHoshimi.ISCommunicativeAgents
 
         public override void DoActions()
         {
-            agent.React(agent.getPerceptions(this));
+            agent.React(agent.getPerceptions(this, this.getAASMAFramework()));
         }
 
         public override void receiveMessage(AASMAMessage msg)
