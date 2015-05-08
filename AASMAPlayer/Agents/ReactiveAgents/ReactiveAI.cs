@@ -58,7 +58,7 @@ namespace AASMAHoshimi.ReactiveAgents
             agent.AddRule(
                 delegate(List<Perception> perceptions)
                 {
-                    if (getAASMAFramework().containersAlive() < 3 && this._nanoAI.State == NanoBotState.WaitingOrders)
+                    if (getAASMAFramework().containersAlive() < 10 && this._nanoAI.State == NanoBotState.WaitingOrders)
                     {
                         return true;
                     }
@@ -112,7 +112,7 @@ namespace AASMAHoshimi.ReactiveAgents
                 delegate(List<Perception> perceptions)
                 {
                     
-                    bool foundHosh = false;
+                   
                     if (getNanoBot().State == NanoBotState.WaitingOrders)
                     {
                         List<Point> points = new List<Point>();
@@ -121,22 +121,41 @@ namespace AASMAHoshimi.ReactiveAgents
                             
                             if (perception.isType(PerceptionType.HoshimiPoint))
                             {
-                                foundHosh = true;
+                                
                                 HoshimiPointPerception per = (HoshimiPointPerception)perception;
-                                points.Add(per.getHoshimiPoint());
+                                points.Add(per.getPoint());
                             }
                         }
-                        Point p = Utils.getNearestPoint(this.getNanoBot().Location, points);
-                        agent.storeTemp(p);
-                        if (foundHosh)
-                        {
-                            getAASMAFramework().logData(this._nanoAI, "I want to go to Hoshimi ");
-                        }
-                        return foundHosh;
+                            bool onCicle = true;                     
+                            while (onCicle)
+                            {
+                                if (points.Count > 0)
+                                {
+                                    Point p = Utils.getNearestPoint(this.getNanoBot().Location, points);
+                                    if (needleOnHoshimi(p, perceptions))
+                                    {
+                                        points.Remove(p);
+                                        continue;
+                                    } else {
+                                        agent.storeTemp(p);
+                                        getAASMAFramework().logData(this._nanoAI, "I want to go to Hoshimi ");
+                                        return true;
+                                    }
+                                    
+                                } else{
+                                    onCicle = false;
+                                    return false;
+                                }
+                            }
+                                
+                            }
+                            
+                        
+                        return false;
 
                        
-                    }
-                    return false;
+                 
+                   
 
                 }, delegate(ReactiveAgent a, List<Perception> perceptions)
                 {
@@ -187,6 +206,11 @@ namespace AASMAHoshimi.ReactiveAgents
             agent.React(agent.getPerceptions(this._nanoAI, this.getAASMAFramework()));
         }
 
+        public bool needleOnHoshimi(Point p, List<Perception> perceptions)
+        {
+            //TODO 
+            return false;
+        }
 
         public override void receiveMessage(AASMAMessage msg)
         {

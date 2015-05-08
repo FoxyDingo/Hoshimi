@@ -4,7 +4,7 @@ using PH.Map;
 using System.Collections.Generic;
 using System.Drawing;
 using AASMAHoshimi.Examples;
-
+using AASMAHoshimi.ReactiveAgents;
 
 using AASMAHoshimi;
 
@@ -16,31 +16,41 @@ namespace AASMAHoshimi.ISCommunicativeAgents
         ReactiveAgent agent = new ReactiveAgent();
         public ISCommunicativeNeedle()
         {
-            // Shoots a pierre nanobot
-            // it shoots one of them, may not be the closest one
+            // Shoots the closest pierre nanobot
             agent.AddRule(
                 delegate(List<Perception> perceptions)
                 {
-                    foreach (var perception in perceptions)
+                    List<Point> points = new List<Point>();
+                    bool hasTarget = false;
+                    if (this.State.Equals(NanoBotState.WaitingOrders))
                     {
-                        if (perception.isType(PerceptionType.EnemyBot))
+                        foreach (var perception in perceptions)
                         {
-                            EnemyBotPerception p = (EnemyBotPerception)perception;
-                            NanoBotInfo bot = p.getBot();
-                            if (canShoot(bot.Location))
+                            if (perception.isType(PerceptionType.EnemyBot))
                             {
-                                agent.storeTemp(bot);
-                                return true;
+                                EnemyBotPerception per = (EnemyBotPerception)perception;
+                                Point p = per.getPoint();
+                                if (canShoot(p))
+                                {
+                                    hasTarget = true;
+                                    points.Add(p);
+                                }
                             }
                         }
+                        if (hasTarget)
+                        {
+                            Point p = Utils.getNearestPoint(this.Location, points);
+                            agent.storeTemp(p);
+                        }
+                        return hasTarget;
                     }
                     return false;
+
                 },
                 delegate(ReactiveAgent a, List<Perception> perceptions)
                 {
-                    // TODO get the closest one!
-                    NanoBotInfo bot = (NanoBotInfo)agent.getTemp();
-                    this.DefendTo(bot.Location, 1);
+                    Point p = (Point)agent.getTemp();
+                    this.DefendTo(p, 1);
                 }
             );
         }

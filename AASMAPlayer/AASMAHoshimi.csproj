@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="AASMAMessage.cs" />
     <Compile Include="AASMAPlayer.cs" />
+    <Compile Include="Agents\ReactiveAgents\ReactiveAgent.cs" />
     <Compile Include="Agents\ReactiveAgents\ReactiveAI.cs" />
     <Compile Include="Agents\ReactiveAgents\ReactiveContainer.cs" />
     <Compile Include="Agents\ReactiveAgents\ReactiveExplorer.cs" />
@@ -75,7 +76,6 @@
     <Compile Include="Examples\CommunicativeExplorer.cs" />
     <Compile Include="Agents\ISCommunicativeAgents\ISCommunicativeProtector.cs" />
     <Compile Include="Agents\Perception.cs" />
-    <Compile Include="Agents\ReactiveAgent.cs" />
     <Compile Include="Agents\ISCommunicativeAgents\ISCommunicativeAI.cs" />
     <Compile Include="Agents\ISCommunicativeAgents\ISCommunicativeContainer.cs" />
     <Compile Include="Agents\ISCommunicativeAgents\ISCommunicativeExplorer.cs" />

@@ -5,7 +5,7 @@ using System.Drawing;
 
 using AASMAHoshimi;
 
-namespace AASMAHoshimi.Examples
+namespace AASMAHoshimi
 {
     public enum PerceptionType
     {
@@ -13,8 +13,11 @@ namespace AASMAHoshimi.Examples
         EnemyBot,
         HoshimiPoint,
         AZNPoint,
+        NavPoint,
         BloodStream,
         Cell,
+        EmptyNeedle,
+        FullNeedle,
         None
     }
 
@@ -57,11 +60,41 @@ namespace AASMAHoshimi.Examples
     public class EnemyBotPerception : Perception
     {
         public const PerceptionType TYPE = PerceptionType.EnemyBot;
-        public EnemyBotPerception(NanoBotInfo obj, double distance) : base(obj, distance) { }
+        public EnemyBotPerception(Point obj, double distance) : base(obj, distance) { }
 
-        public NanoBotInfo getBot()
+        public Point getPoint()
         {
-            return (NanoBotInfo)obj;
+            return (Point)obj;
+        }
+        public override PerceptionType getType()
+        {
+            return TYPE;
+        }
+    }
+
+    public class EmptyNeedlePerception : Perception
+    {
+        public const PerceptionType TYPE = PerceptionType.EmptyNeedle;
+        public EmptyNeedlePerception(Point obj, double distance) : base(obj, distance) { }
+
+        public Point getPoint()
+        {
+            return (Point) obj;
+        }
+        public override PerceptionType getType()
+        {
+            return TYPE;
+        }
+    }
+
+    public class FullNeedlePerception : Perception
+    {
+        public const PerceptionType TYPE = PerceptionType.FullNeedle;
+        public FullNeedlePerception(Point obj, double distance) : base(obj, distance) { }
+
+        public Point getPoint()
+        {
+            return (Point)obj;
         }
         public override PerceptionType getType()
         {
@@ -74,7 +107,7 @@ namespace AASMAHoshimi.Examples
         public const PerceptionType TYPE = PerceptionType.AZNPoint;
         public AZNPointPerception(Point obj, double distance) : base(obj, distance) { }
 
-        public Point getAZNPoint()
+        public Point getPoint()
         {
             return (Point) obj;
         }
@@ -89,7 +122,7 @@ namespace AASMAHoshimi.Examples
         public const PerceptionType TYPE = PerceptionType.HoshimiPoint;
         public HoshimiPointPerception(Point obj, double distance) : base(obj, distance) { }
 
-        public Point getHoshimiPoint()
+        public Point getPoint()
         {
             return (Point) obj;
         }
@@ -99,9 +132,24 @@ namespace AASMAHoshimi.Examples
         }
     }
 
+    public class NavPointPerception : Perception
+    {
+        public const PerceptionType TYPE = PerceptionType.NavPoint;
+        public NavPointPerception(Point obj, double distance) : base(obj, distance) { }
+
+        public Point getPoint()
+        {
+            return (Point)obj;
+        }
+        public override PerceptionType getType()
+        {
+            return TYPE;
+        }
+    }
+
     public class BloodStreamPerception : Perception
     {
-        public const PerceptionType TYPE = PerceptionType.AZNPoint;
+        public const PerceptionType TYPE = PerceptionType.BloodStream;
         public BloodStreamPerception(BloodStream obj, double distance) : base(obj, distance) { }
 
         public BloodStream getBloodStream()

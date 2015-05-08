@@ -6,7 +6,7 @@ using System.Drawing;
 
 using AASMAHoshimi;
 
-namespace AASMAHoshimi.Examples
+namespace AASMAHoshimi.ReactiveAgents
 {
     public class ReactiveAgent
     {
@@ -76,13 +76,13 @@ namespace AASMAHoshimi.Examples
             // Other team's bots
             if (bot_.PlayerOwner.OtherNanoBotsInfo != null)
             {
-                foreach (NanoBotInfo bot in bot_.PlayerOwner.OtherNanoBotsInfo)
+
+                foreach (Point p in aasmaframework.visiblePierres(bot_))
                 {
-                    double distance = Utils.SquareDistance(bot_.Location, bot.Location);
-                    if (distance < sqScanDistance)
-                    {
-                        perceptions.Add(new EnemyBotPerception(bot, distance));
-                    }
+                    double distance = Utils.SquareDistance(bot_.Location, p);
+                    
+                    perceptions.Add(new EnemyBotPerception(p, distance));
+                    
                 }
             }
 
@@ -90,21 +90,39 @@ namespace AASMAHoshimi.Examples
             foreach (Point p in aasmaframework.visibleAznPoints(bot_))
             {
                 double distance = Utils.SquareDistance(bot_.Location, p);
-                if (distance < sqScanDistance)
-                {
-                    perceptions.Add(new AZNPointPerception(p, distance));
-                }
+                perceptions.Add(new AZNPointPerception(p, distance));
+                
             }
 
             //Hoshimi points
             foreach (Point p in aasmaframework.visibleHoshimies(bot_))
             {
                 double distance = Utils.SquareDistance(bot_.Location, p);
-                if (distance < sqScanDistance)
-                {
-                    
-                    perceptions.Add(new HoshimiPointPerception(p, distance));
-                }
+                perceptions.Add(new HoshimiPointPerception(p, distance));
+               
+            }
+
+            //Nav Points
+            foreach (Point p in aasmaframework.visibleNavigationPoints(bot_))
+            {
+                double distance = Utils.SquareDistance(bot_.Location, p);
+                perceptions.Add(new NavPointPerception(p, distance));
+            }
+
+            //Empty Needles
+            foreach (Point p in aasmaframework.visibleEmptyNeedles(bot_))
+            {
+                double distance = Utils.SquareDistance(bot_.Location, p);
+                perceptions.Add(new EmptyNeedlePerception(p, distance));
+                
+            }
+
+            //Full Needles
+            foreach (Point p in aasmaframework.visibleFullNeedles(bot_))
+            {
+                double distance = Utils.SquareDistance(bot_.Location, p);
+                perceptions.Add(new FullNeedlePerception(p, distance));
+
             }
 
             // Blood streams
