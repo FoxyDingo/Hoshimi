@@ -10,10 +10,17 @@ namespace AASMAHoshimi.ReactiveAgents
     [Characteristics(ContainerCapacity = 0, CollectTransfertSpeed = 0, Scan = 30, MaxDamage = 0, DefenseDistance = 0, Constitution = 10)]
     public class ReactiveExplorer : AASMAExplorer
     {
-        ReactiveAgent agent = new ReactiveAgent();
+        ReactiveAgent agent;
 
         public ReactiveExplorer() : base() 
         {
+
+            //I'm only interested in NavPoint perceptions!!
+            int[] interests = new int[1];
+            interests[0] = (int)PerceptionType.NavPoint;
+            agent = new ReactiveAgent(interests);
+
+
             //Move away from nav point
             agent.AddRule(
                 delegate(List<Perception> perceptions)
@@ -68,7 +75,7 @@ namespace AASMAHoshimi.ReactiveAgents
             agent.AddRule(
                 delegate(List<Perception> perceptions)
                 {
-                    bool foundNav = false;
+                    
                     if (this.State == NanoBotState.WaitingOrders)
                     {
                         List<Point> points = new List<Point>();
@@ -77,19 +84,20 @@ namespace AASMAHoshimi.ReactiveAgents
 
                             if (perception.isType(PerceptionType.NavPoint))
                             {
-                                foundNav = true;
+                                
                                 NavPointPerception per = (NavPointPerception)perception;
                                 points.Add(per.getPoint());
                             }
                         }
                         
-                        if (foundNav)
+                        if (points.Count > 0)
                         {
                             Point p = Utils.getNearestPoint(this.Location, points);
                             agent.storeTemp(p);
                             getAASMAFramework().logData(this, "I want to go to a Nav point ");
+                            return true;
                         }
-                        return foundNav;
+                        return false;
 
 
                     }

@@ -206,9 +206,27 @@ namespace AASMAHoshimi.ReactiveAgents
             agent.React(agent.getPerceptions(this._nanoAI, this.getAASMAFramework()));
         }
 
-        public bool needleOnHoshimi(Point p, List<Perception> perceptions)
+        public bool needleOnHoshimi(Point point, List<Perception> perceptions)
         {
-            //TODO 
+            List<Point> points = new List<Point>();
+            foreach (var perception in perceptions)
+            {
+                if (perception.isType(PerceptionType.EmptyNeedle) || perception.isType(PerceptionType.FullNeedle)) 
+                {
+                    EmptyNeedlePerception per = (EmptyNeedlePerception) perception;
+                    points.Add(per.getPoint());
+                }
+            }
+            if (points.Count > 0)
+            {
+                foreach (Point p in points)
+                {
+                    if (p.Equals(point))
+                    {
+                        return true;
+                    }
+                }
+            }
             return false;
         }
 

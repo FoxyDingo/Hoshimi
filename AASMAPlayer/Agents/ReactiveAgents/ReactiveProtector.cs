@@ -12,11 +12,17 @@ namespace AASMAHoshimi.ReactiveAgents
     [Characteristics(ContainerCapacity = 0, CollectTransfertSpeed = 0, Scan = 5, MaxDamage = 5, DefenseDistance = 12, Constitution = 28)]
     public class ReactiveProtector : AASMAProtector
     {
-         ReactiveAgent agent = new ReactiveAgent();
+         ReactiveAgent agent;
 
         public ReactiveProtector()
             : base()
         {
+
+            //I'm only interested in EnemyBot perceptions!!
+            int[] interests = new int[1];
+            interests[0] = (int)PerceptionType.EnemyBot;
+            agent = new ReactiveAgent(interests);
+
             // Shoots the closest pierre nanobot
             agent.AddRule(
                 delegate(List<Perception> perceptions)

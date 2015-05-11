@@ -55,7 +55,7 @@ namespace AASMAHoshimi.ReactiveAgents
                 {
                     try
                     {
-                        bool foundAzn = false;
+                        
                         if (this.State == NanoBotState.WaitingOrders && Stock < ContainerCapacity)
                         {
                             List<Point> points = new List<Point>();
@@ -64,18 +64,19 @@ namespace AASMAHoshimi.ReactiveAgents
 
                                 if (perception.isType(PerceptionType.AZNPoint))
                                 {
-                                    foundAzn = true;
+                                    
                                     AZNPointPerception per = (AZNPointPerception)perception;
                                     points.Add(per.getPoint());
                                 }
                             }
-                            if (foundAzn)
+                            if (points.Count > 0)
                             {
                                 Point p = Utils.getNearestPoint(this.Location, points);
                                 agent.storeTemp(p);
                                 getAASMAFramework().logData(this, "I want to go Azn point ");
+                                return true;
                             }
-                            return foundAzn;
+                            return false;
 
 
                         }
