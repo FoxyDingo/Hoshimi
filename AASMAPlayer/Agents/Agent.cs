@@ -115,13 +115,17 @@ namespace AASMAHoshimi
                 }
             }
 
-            //Hoshimi points
+            //Hoshimi points (WITHOUT NEEDLES)
             if (perceptionsInterested[(int)PerceptionType.HoshimiPoint])
             {
                 foreach (Point p in aasmaframework.visibleHoshimies(bot_))
                 {
-                    double distance = Utils.SquareDistance(bot_.Location, p);
-                    perceptions.Add(new HoshimiPointPerception(p, distance));
+                    if (!(aasmaframework.visibleEmptyNeedles(bot_).Contains(p) || aasmaframework.visibleFullNeedles(bot_).Contains(p)))
+                    {
+                        double distance = Utils.SquareDistance(bot_.Location, p);
+                        perceptions.Add(new HoshimiPointPerception(p, distance));
+                    }
+                    
 
                 }
             }

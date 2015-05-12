@@ -126,36 +126,17 @@ namespace AASMAHoshimi.ReactiveAgents
                                 points.Add(per.getPoint());
                             }
                         }
-                            bool onCicle = true;                     
-                            while (onCicle)
-                            {
-                                if (points.Count > 0)
-                                {
-                                    Point p = Utils.getNearestPoint(this.getNanoBot().Location, points);
-                                    if (needleOnHoshimi(p, perceptions))
-                                    {
-                                        points.Remove(p);
-                                        continue;
-                                    } else {
-                                        agent.storeTemp(p);
-                                        getAASMAFramework().logData(this._nanoAI, "I want to go to Hoshimi ");
-                                        return true;
-                                    }
-                                    
-                                } else{
-                                    onCicle = false;
-                                    return false;
-                                }
-                            }
+                        if (points.Count > 0)
+                        {
+                            Point p = Utils.getNearestPoint(this.getNanoBot().Location, points);
+                            agent.storeTemp(p);
+                            getAASMAFramework().logData(this._nanoAI, "I want to go to Hoshimi ");
+                            return true;
+                        }   
                                 
-                            }
-                            
-                        
-                        return false;
-
-                       
-                 
-                   
+                    }
+                    return false;
+                                    
 
                 }, delegate(ReactiveAgent a, List<Perception> perceptions)
                 {
