@@ -7,8 +7,8 @@ using System.Drawing;
 namespace AASMAHoshimi.DeliberativeAgents
 {
     //public delegate void AgentAction(object body, PerceptMemory perceptMemory);
-    
-    public enum Desires 
+
+    public enum Desires
     {
         None,
         Unload,
@@ -24,7 +24,7 @@ namespace AASMAHoshimi.DeliberativeAgents
 
     public class DeliberativeAgent : Agent
     {
-       
+
         public DeliberativeAgent()
             : base()
         { }
@@ -33,19 +33,20 @@ namespace AASMAHoshimi.DeliberativeAgents
             : base(interests)
         { }
 
-        
-
-        
 
 
-    
-    
-   
-    public class Plan
-    {
-     
+
+
+
+
+
+
+        public class Plan
+        {
+
+        }
+
+
+
     }
-
-   
-   
 }

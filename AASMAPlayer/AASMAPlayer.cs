@@ -8,6 +8,7 @@ using PH.Map;
 using AASMAHoshimi.Examples;
 using AASMAHoshimi.ISCommunicativeAgents;
 using AASMAHoshimi.ReactiveAgents;
+using AASMAHoshimi.DeliberativeAgents;
 
 namespace AASMAHoshimi
 {
@@ -42,7 +43,7 @@ namespace AASMAHoshimi
         
         public virtual AASMAAI buildAIAgent(NanoAI nanoAI)
         {
-            return new ReactiveAI(nanoAI);
+            return new DeliberativeAI(nanoAI);
         }
 
         #region AASMA_STUDENTS-DO_NOT_CHANGE_ANYTHING_HERE

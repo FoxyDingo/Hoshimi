@@ -69,6 +69,11 @@
     <Compile Include="Agents\Agent.cs" />
     <Compile Include="Agents\DeliberativeAgents\DeliberativeAgent.cs" />
     <Compile Include="Agents\DeliberativeAgents\DeliberativeAI.cs" />
+    <Compile Include="Agents\DeliberativeAgents\DeliberativeContainer.cs" />
+    <Compile Include="Agents\DeliberativeAgents\DeliberativeExplorer.cs" />
+    <Compile Include="Agents\DeliberativeAgents\DeliberativeNeedle.cs" />
+    <Compile Include="Agents\DeliberativeAgents\DeliberativeProtector.cs" />
+    <Compile Include="Agents\PlanCheckPoint.cs" />
     <Compile Include="Agents\ReactiveAgents\ReactiveAgent.cs" />
     <Compile Include="Agents\ReactiveAgents\ReactiveAI.cs" />
     <Compile Include="Agents\ReactiveAgents\ReactiveContainer.cs" />
