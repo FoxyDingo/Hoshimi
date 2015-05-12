@@ -1,14 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using PH.Common;
+using System.Drawing;
 
 namespace AASMAHoshimi.DeliberativeAgents
 {
-    public delegate void AgentAction(object body, PerceptMemory perceptMemory);
+    //public delegate void AgentAction(object body, PerceptMemory perceptMemory);
+    
 
     public class DeliberativeAgent : Agent
     {
         private Plan plan;
+        protected List<DesiresDelegate> desiresDelegates = new List<DesiresDelegate>();
+        public delegate List<KeyValuePair<int, Point>> DesiresDelegate(DeliberativeAgent agent, List<Perception> beliefs);
+        protected List<IntentionsDelegate> intentionsDelegates = new List<IntentionsDelegate>();
+        public delegate List<KeyValuePair<int, Point>> IntentionsDelegate(DeliberativeAgent agent, List<KeyValuePair<int,Point>> desires);
+        protected List<ActionsDelegate> actionsDelegates = new List<ActionsDelegate>();
+        public delegate ActionsDelegate ActionsDelegate(DeliberativeAgent agent, List<KeyValuePair<int, Point>> intentions);
+
         public DeliberativeAgent()
             : base()
         { }
@@ -17,18 +27,64 @@ namespace AASMAHoshimi.DeliberativeAgents
             : base(interests)
         { }
 
+        public void AddDesire(DesiresDelegate desire)
+        {
+            desiresDelegates.Add(desire);
+        }
+
+        public void AddIntention(IntentionsDelegate intention)
+        {
+            intentionsDelegates.Add(intention);
+        }
+
+        public void Deliberate(List<Perception> beliefs, NanoBot bot_)
+        {
+            if (!(plan.isEmpty() || plan.succeeded() || plan.impossible()))
+            {
+                //see if we should reconsider plan
+                //Execute plan step
+                //review beliefs and generate desires
+                
+            }
+            else
+            {
+                List<KeyValuePair<int, Point>> desires;
+                List<KeyValuePair<int, Point>> intentions;
+                List < ActionsDelegate > actions;
+                //review beliefs and generate desires
+                
+                foreach (DesiresDelegate desire in desiresDelegates)
+                {
+                    desires = desire(this, beliefs);
+                }
+                //given a desire generate an intention
+                foreach (IntentionsDelegate intention in intentionsDelegates)
+                {
+                   intentions = intention(this, desires);
+                }
+                //with an intention generate a plan
+                foreach (ActionsDelegate action in actionsDelegates)
+                {
+                    actions = action(this, intentions);
+                }
+                //execute plan step
+            }
+        }
+
+        
+
 
     }
 
     public class Plan
     {
         //This is the list of plan steps
-        protected List<KeyValuePair<Condition, AgentAction>> actions;
+        //protected List<KeyValuePair<Condition, AgentAction>> actions;
 
         public Plan()
         {
             //The obrigatory variable initialization, so that we neve get a null pointer exception, for this
-            this.actions = new List<KeyValuePair<Condition, AgentAction>>();
+           // this.actions = new List<KeyValuePair<Condition, AgentAction>>();
         }
 
         public bool Empty { get { return actions.Count == 0; } }
@@ -49,7 +105,7 @@ namespace AASMAHoshimi.DeliberativeAgents
     public class PerceptMemory
     {
     }
-    #region Delegates
+   /* #region Delegates
 
     /// <summary>
     /// This delegate is used to see if a condition holds against the current set
@@ -82,5 +138,5 @@ namespace AASMAHoshimi.DeliberativeAgents
     /// <returns>The plan to use.</returns>
     public delegate Plan PlanTemplate(PerceptMemory percepts);
 
-    #endregion
+    #endregion*/
 }
