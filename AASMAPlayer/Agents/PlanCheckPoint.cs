@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
-
+using AASMAHoshimi.DeliberativeAgents;
 namespace AASMAHoshimi
 {
     class PlanCheckPoint
@@ -23,11 +23,20 @@ namespace AASMAHoshimi
         };
         public Point location;
         public Actions action;
+        public Desires intention;
 
         public PlanCheckPoint(Point p, Actions a)
         {
             location = p;
             action = a;
+            intention = Desires.None;
+        }
+
+        public PlanCheckPoint(Point p, Actions a, Desires d)
+        {
+            location = p;
+            action = a;
+            intention = d;
         }
     }
 }

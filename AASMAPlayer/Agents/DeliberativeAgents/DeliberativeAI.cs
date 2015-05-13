@@ -11,8 +11,6 @@ namespace AASMAHoshimi.DeliberativeAgents
     class DeliberativeAI : AASMAAI
     {
         
-        public delegate void ActionDelegate(NanoBot bot);
-
         private List<PlanCheckPoint> planCheckPoints = new List<PlanCheckPoint>();
         private bool planIsFinished = true;
         //TODO
@@ -44,7 +42,7 @@ namespace AASMAHoshimi.DeliberativeAgents
             }
         }
 
-        //TODO change previousinstruction to waitingorders
+        
         public void execute()
         {
             if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders))
@@ -203,7 +201,7 @@ namespace AASMAHoshimi.DeliberativeAgents
             {
                 desires.Add(new KeyValuePair<Desires, Point>(Desires.BuildExplorer, new Point()));
             }
-            if (getAASMAFramework().containersAlive() < 2)
+            if (getAASMAFramework().containersAlive() < 15)
             {
                 desires.Add(new KeyValuePair<Desires, Point>(Desires.BuildContainer, new Point()));
             }
