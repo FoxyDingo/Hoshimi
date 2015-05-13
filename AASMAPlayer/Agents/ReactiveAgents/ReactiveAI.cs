@@ -24,7 +24,7 @@ namespace AASMAHoshimi.ReactiveAgents
             agent.AddRule(
                 delegate(List<Perception> perceptions)
                 {
-                    if (getAASMAFramework().protectorsAlive() < 3 && this._nanoAI.State == NanoBotState.WaitingOrders)
+                    if (getAASMAFramework().protectorsAlive() < 10 && this._nanoAI.State == NanoBotState.WaitingOrders)
                     {
                         return true;
                     }
@@ -41,7 +41,7 @@ namespace AASMAHoshimi.ReactiveAgents
             agent.AddRule(
                 delegate(List<Perception> perceptions)
                 {
-                    if (getAASMAFramework().explorersAlive() < 3 && this._nanoAI.State == NanoBotState.WaitingOrders)
+                    if (getAASMAFramework().explorersAlive() < 10 && this._nanoAI.State == NanoBotState.WaitingOrders)
                     {
                         return true;
                     }

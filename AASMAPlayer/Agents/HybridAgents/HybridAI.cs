@@ -5,44 +5,67 @@ using PH.Common;
 using System.Drawing;
 
 
-namespace AASMAHoshimi.DeliberativeAgents
+namespace AASMAHoshimi.HybridAgents
 {
 
-    class DeliberativeAI : AASMAAI
+    class HybridAI : AASMAAI
     {
-        
+
         private List<PlanCheckPoint> planCheckPoints = new List<PlanCheckPoint>();
         private bool planIsFinished = true;
         //TODO
         private bool planImpossible = false;
-      
-        PlanCheckPoint currentInstruction;
-        
 
-        protected DeliberativeAgent agent = new DeliberativeAgent();
-        public DeliberativeAI(NanoAI nanoAI)
+        PlanCheckPoint currentInstruction;
+
+
+        protected HybridAgent agent = new HybridAgent();
+        public HybridAI(NanoAI nanoAI)
             : base(nanoAI)
         {
-           
-           
+
+
         }
 
         public override void DoActions()
         {
-            List<KeyValuePair<Desires, Point>> desires = getDesires();
-            if (planIsFinished || planImpossible)
+            if (!React())
             {
-                KeyValuePair<Desires, Point> intention = deliberate(desires);
-                plan(intention);
-                execute();
+                List<KeyValuePair<Desires, Point>> desires = getDesires();
+                if (planIsFinished || planImpossible)
+                {
+                    KeyValuePair<Desires, Point> intention = deliberate(desires);
+                    plan(intention);
+                    execute();
+                }
+                else
+                {
+                    execute();
+                }
             }
-            else
-            {
-                execute();
-            }
+            
         }
 
-        
+        public bool React()
+        {
+            //TODO RUN AWAY FROM PIERRES
+            if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders) && this._protectorNumber < 10)
+            {
+                this._nanoAI.Build(typeof(HybridProtector), "P" + this._protectorNumber++);
+
+            }
+            if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders) && this._explorerNumber < 10)
+            {
+                this._nanoAI.Build(typeof(HybridExplorer), "E" + this._explorerNumber++);
+
+            }
+            if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders) && this._containerNumber < 10)
+            {
+                this._nanoAI.Build(typeof(HybridContainer), "C" + this._containerNumber++);
+
+            }
+            return false;
+        }
         public void execute()
         {
             if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders))
@@ -63,22 +86,22 @@ namespace AASMAHoshimi.DeliberativeAgents
                     if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders))
                     {
                         getNanoBot().MoveTo(currentInstruction.location);
-                        
+
                     }
-                    
+
                     break;
                 case PlanCheckPoint.Actions.MoveRandom:
                     if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders))
                     {
                         moveRandom();
                     }
-                   
+
                     break;
                 case PlanCheckPoint.Actions.BuildNeedle:
                     if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders))
                     {
-                        this._nanoAI.Build(typeof(DeliberativeNeedle), "N" + this._needleNumber++);
-                                                
+                        this._nanoAI.Build(typeof(HybridNeedle), "N" + this._needleNumber++);
+
                     }
                     else
                     {
@@ -86,30 +109,10 @@ namespace AASMAHoshimi.DeliberativeAgents
                         {
                             planIsFinished = true;
                         }
-                        
+
                     }
                     break;
-                case PlanCheckPoint.Actions.BuildContainer:
-                    if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders))
-                    {
-                        this._nanoAI.Build(typeof(DeliberativeContainer), "C" + this._containerNumber++);
-                    }
-                    
-                    break;
-                case PlanCheckPoint.Actions.BuildProtector:
-                    if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders))
-                    {
-                        this._nanoAI.Build(typeof(DeliberativeProtector), "P" + this._protectorNumber++);
-                    }
-                   
-                    break;
-                case PlanCheckPoint.Actions.BuildExplorer:
-                    if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders))
-                    {
-                        this._nanoAI.Build(typeof(DeliberativeExplorer), "E" + this._explorerNumber++);
-                    }
-                   
-                    break;
+               
             }
 
         }
@@ -117,7 +120,7 @@ namespace AASMAHoshimi.DeliberativeAgents
         public void plan(KeyValuePair<Desires, Point> intention)
         {
             planCheckPoints.Clear();
-            
+
             switch (intention.Key)
             {
                 case Desires.None:
@@ -129,44 +132,13 @@ namespace AASMAHoshimi.DeliberativeAgents
                     planCheckPoints.Add(new PlanCheckPoint(intention.Value, PlanCheckPoint.Actions.BuildNeedle));
                     planIsFinished = false;
                     break;
-                case Desires.BuildContainer:
-                    planCheckPoints.Add(new PlanCheckPoint(getNanoBot().Location, PlanCheckPoint.Actions.BuildContainer));
-                    planIsFinished = false;
-                    break;
-                case Desires.BuildProtector:
-                    planCheckPoints.Add(new PlanCheckPoint(getNanoBot().Location, PlanCheckPoint.Actions.BuildProtector));
-                    planIsFinished = false;
-                    break;
-                case Desires.BuildExplorer:
-                    planCheckPoints.Add(new PlanCheckPoint(getNanoBot().Location, PlanCheckPoint.Actions.BuildExplorer));
-                    planIsFinished = false;
-                    break;
+               
             }
         }
 
-        public KeyValuePair<Desires, Point> deliberate(List<KeyValuePair<Desires, Point>> desires) 
-        { 
-            foreach(KeyValuePair<Desires, Point> desire in desires)
-            {
-                if(desire.Key.Equals(Desires.BuildProtector))
-                { 
-                    return new KeyValuePair<Desires,Point>(desire.Key, desire.Value);
-                }
-            }
-            foreach (KeyValuePair<Desires, Point> desire in desires)
-            {
-                if (desire.Key.Equals(Desires.BuildExplorer))
-                {
-                    return new KeyValuePair<Desires, Point>(desire.Key, desire.Value);
-                }
-            }
-            foreach (KeyValuePair<Desires, Point> desire in desires)
-            {
-                if (desire.Key.Equals(Desires.BuildContainer))
-                {
-                    return new KeyValuePair<Desires, Point>(desire.Key, desire.Value);
-                }
-            }
+        public KeyValuePair<Desires, Point> deliberate(List<KeyValuePair<Desires, Point>> desires)
+        {
+            
             List<Point> hoshimiPoints = new List<Point>();
             foreach (KeyValuePair<Desires, Point> desire in desires)
             {
@@ -180,11 +152,11 @@ namespace AASMAHoshimi.DeliberativeAgents
                 Point p = Utils.getNearestPoint(this.getNanoBot().Location, hoshimiPoints);
                 return new KeyValuePair<Desires, Point>(Desires.BuildNeedle, p);
             }
-            
-            return new KeyValuePair<Desires, Point>(Desires.None, new Point() );
-            
 
-           
+            return new KeyValuePair<Desires, Point>(Desires.None, new Point());
+
+
+
 
         }
 
@@ -193,24 +165,13 @@ namespace AASMAHoshimi.DeliberativeAgents
         {
             List<KeyValuePair<Desires, Point>> desires = new List<KeyValuePair<Desires, Point>>();
             List<Perception> perceptions = agent.getPerceptions(this.getNanoBot(), this.getAASMAFramework());
-            if (getAASMAFramework().protectorsAlive() < 10)
-            {
-                desires.Add(new KeyValuePair<Desires, Point>(Desires.BuildProtector, new Point() ));
-            }
-            if (getAASMAFramework().explorersAlive() < 10)
-            {
-                desires.Add(new KeyValuePair<Desires, Point>(Desires.BuildExplorer, new Point()));
-            }
-            if (getAASMAFramework().containersAlive() < 10)
-            {
-                desires.Add(new KeyValuePair<Desires, Point>(Desires.BuildContainer, new Point()));
-            }
+            
             foreach (Perception per in perceptions)
             {
                 if (per.getType().Equals(PerceptionType.HoshimiPoint))
                 {
                     HoshimiPointPerception p = (HoshimiPointPerception)per;
-                    desires.Add(new KeyValuePair<Desires,Point>(Desires.BuildNeedle, p.getPoint()));
+                    desires.Add(new KeyValuePair<Desires, Point>(Desires.BuildNeedle, p.getPoint()));
                 }
             }
 
@@ -236,12 +197,13 @@ namespace AASMAHoshimi.DeliberativeAgents
             }
         }
 
-        
+
 
         public override void receiveMessage(AASMAMessage msg)
         {
         }
 
-        
+
     }
 }
+

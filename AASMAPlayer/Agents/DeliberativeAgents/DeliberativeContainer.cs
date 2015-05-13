@@ -13,13 +13,14 @@ namespace AASMAHoshimi.DeliberativeAgents
     {
         protected DeliberativeAgent agent = new DeliberativeAgent();
         private List<PlanCheckPoint> planCheckPoints = new List<PlanCheckPoint>();
-        private List<Point> navPointsVisited = new List<Point>();
+        private List<Point> AZNPoints = new List<Point>();
         private bool planIsFinished = true;
 
         //TODO
         private bool planImpossible = false;
 
         PlanCheckPoint currentInstruction = null;
+
 
         public DeliberativeContainer()
             : base()
@@ -142,7 +143,9 @@ namespace AASMAHoshimi.DeliberativeAgents
             }
             if (pointsCollect.Count > 0)
             {
-                Point p = Utils.getNearestPoint(this.Location, pointsCollect);
+                List<Point> temp = new List<Point>(pointsCollect);
+                temp.AddRange(AZNPoints);
+                Point p = Utils.getNearestPoint(this.Location, temp);
                 return new KeyValuePair<Desires, Point>(Desires.Collect, p);
             }
             
@@ -161,6 +164,10 @@ namespace AASMAHoshimi.DeliberativeAgents
                 {
                     AZNPointPerception p = (AZNPointPerception)per;
                     desires.Add(new KeyValuePair<Desires, Point>(Desires.Collect, p.getPoint()));
+                    if (!AZNPoints.Contains(p.getPoint()))
+                    {
+                        AZNPoints.Add(p.getPoint());
+                    }
                 }
                 //Unload AZN
                 if (per.getType().Equals(PerceptionType.EmptyNeedle) && this.Stock > 0)

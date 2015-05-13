@@ -4,7 +4,7 @@ using System.Text;
 using PH.Common;
 using System.Drawing;
 
-namespace AASMAHoshimi.DeliberativeAgents
+namespace AASMAHoshimi.HybridAgents
 {
     //public delegate void AgentAction(object body, PerceptMemory perceptMemory);
 
@@ -22,16 +22,18 @@ namespace AASMAHoshimi.DeliberativeAgents
         Attack
     }
 
-    public class DeliberativeAgent : Agent
+    public class HybridAgent : Agent
     {
+        
 
-        public DeliberativeAgent()
+        public HybridAgent()
             : base()
         { }
 
-        public DeliberativeAgent(int[] interests)
+        public HybridAgent(int[] interests)
             : base(interests)
         { }
+
 
 
 

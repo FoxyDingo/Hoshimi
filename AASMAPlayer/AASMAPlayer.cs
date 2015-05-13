@@ -43,7 +43,7 @@ namespace AASMAHoshimi
         
         public virtual AASMAAI buildAIAgent(NanoAI nanoAI)
         {
-            return new DeliberativeAI(nanoAI);
+            return new ReactiveAI(nanoAI);
         }
 
         #region AASMA_STUDENTS-DO_NOT_CHANGE_ANYTHING_HERE

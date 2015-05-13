@@ -14,7 +14,7 @@ namespace AASMAHoshimi.DeliberativeAgents
     {
         protected DeliberativeAgent agent = new DeliberativeAgent();
         private List<PlanCheckPoint> planCheckPoints = new List<PlanCheckPoint>();
-        private List<Point> navPointsVisited = new List<Point>();
+        
         private bool planIsFinished = true;
 
         //TODO
