@@ -18,9 +18,6 @@ namespace AASMAHoshimi.HybridAgents
         private bool planImpossible = false;
         PlanCheckPoint currentInstruction = null;
 
-        private List<Point> hoshimiesBroadcasted = new List<Point>();
-        private List<Point> navPointsBroadcasted = new List<Point>();
-        private List<Point> aznPointsBroadcasted = new List<Point>();
 
         public HybridExplorer()
             : base()

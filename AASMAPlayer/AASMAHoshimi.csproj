@@ -69,7 +69,7 @@
     <Compile Include="Agents\Agent.cs" />
     <Compile Include="Agents\COMHybridAgents\COMHybridAgent.cs" />
     <Compile Include="Agents\COMHybridAgents\COMHybridAI.cs" />
-    <Compile Include="Agents\COMHybridAgents\ComHybridContainer.cs" />
+    <Compile Include="Agents\COMHybridAgents\COMHybridContainer.cs" />
     <Compile Include="Agents\COMHybridAgents\COMHybridExplorer.cs" />
     <Compile Include="Agents\COMHybridAgents\COMHybridNeedle.cs" />
     <Compile Include="Agents\COMHybridAgents\COMHybridProtector.cs" />

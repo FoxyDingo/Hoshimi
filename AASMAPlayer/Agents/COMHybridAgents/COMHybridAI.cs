@@ -15,9 +15,9 @@ namespace AASMAHoshimi.COMHybridAgents
         private bool planIsFinished = true;
         //TODO
         private bool planImpossible = false;
-
         PlanCheckPoint currentInstruction;
 
+        List<Point> hoshimiPoints = new List<Point>();
 
         protected COMHybridAgent agent = new COMHybridAgent();
         public COMHybridAI(NanoAI nanoAI)
@@ -43,6 +43,13 @@ namespace AASMAHoshimi.COMHybridAgents
                     execute();
                 }
             }
+            
+            for (int i = 1; i <= 4; i++)
+            {
+                AASMAMessage msg = new AASMAMessage(this.getNanoBot().InternalName, "PROTECT");
+                msg.Tag = this.getNanoBot().Location;
+                getAASMAFramework().sendMessage(msg, "P" + i);
+            }
 
         }
 
@@ -64,27 +71,28 @@ namespace AASMAHoshimi.COMHybridAgents
 
                 hasReacted = true;
             }
-            if (this._protectorNumber < 10 && !hasReacted)
+            if (getAASMAFramework().protectorsAlive() < 14 && !hasReacted)
             {
                 _nanoAI.StopMoving();
                 this._nanoAI.Build(typeof(COMHybridProtector), "P" + this._protectorNumber++);
                 hasReacted = true;
 
             }
-            if (this._explorerNumber < 10 && !hasReacted)
-            {
-                _nanoAI.StopMoving();
-                this._nanoAI.Build(typeof(COMHybridExplorer), "E" + this._explorerNumber++);
-                hasReacted = true;
-
-            }
-            if (this._containerNumber < 10 && !hasReacted)
+            if (getAASMAFramework().containersAlive() < 10 && !hasReacted)
             {
                 _nanoAI.StopMoving();
                 this._nanoAI.Build(typeof(COMHybridContainer), "C" + this._containerNumber++);
                 hasReacted = true;
 
             }
+            if (getAASMAFramework().explorersAlive() < 8 && !hasReacted)
+            {
+                _nanoAI.StopMoving();
+                this._nanoAI.Build(typeof(COMHybridExplorer), "E" + this._explorerNumber++);
+                hasReacted = true;
+
+            }
+            
             //We want the agent to follow the plan that he stopped when reacting
             if (hasReacted)
             {
@@ -133,6 +141,11 @@ namespace AASMAHoshimi.COMHybridAgents
                     if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders))
                     {
                         this._nanoAI.Build(typeof(COMHybridNeedle), "N" + this._needleNumber++);
+                        hoshimiPoints.Remove(this._nanoAI.Location);
+                        AASMAMessage msg = new AASMAMessage("AI", "EMPTY NEEDLE");
+                        msg.Tag = this._nanoAI.Location;
+                        //sendToAll(msg, "C");
+                        getAASMAFramework().broadCastMessage(msg);
 
                     }
                     else
@@ -196,6 +209,13 @@ namespace AASMAHoshimi.COMHybridAgents
         public List<KeyValuePair<Desires, Point>> getDesires()
         {
             List<KeyValuePair<Desires, Point>> desires = new List<KeyValuePair<Desires, Point>>();
+
+            if (hoshimiPoints.Count > 0)
+            {
+                Point p = Utils.getNearestPoint(this._nanoAI.Location, hoshimiPoints);
+                desires.Add(new KeyValuePair<Desires, Point>(Desires.BuildNeedle, p));
+            }
+
             List<Perception> perceptions = agent.getPerceptions(this.getNanoBot(), this.getAASMAFramework());
 
             foreach (Perception per in perceptions)
@@ -233,6 +253,29 @@ namespace AASMAHoshimi.COMHybridAgents
 
         public override void receiveMessage(AASMAMessage msg)
         {
+            if (msg.Content.Equals("HOSHIMI POINT")) 
+            {
+                Point p = (Point) msg.Tag;
+                if (!hoshimiPoints.Contains(p))
+                {
+                    hoshimiPoints.Add(p);
+                }
+                
+            }
+        }
+
+        //Sends msg to all nanobots of type s (E, C, P...)
+        public void sendToAll(AASMAMessage msg, string s)
+        {
+            foreach (NanoBot n in getAASMAFramework().NanoBots)
+            {
+                if (n.InternalName.StartsWith(s))
+                {
+                    getAASMAFramework().sendMessage(msg, n.InternalName);
+                    getAASMAFramework().logData(this._nanoAI, "sending msg to " + msg.Receiver + " : " + msg.Content);
+                }
+            }
+
         }
 
 

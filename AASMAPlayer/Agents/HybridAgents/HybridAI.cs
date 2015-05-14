@@ -64,21 +64,21 @@ namespace AASMAHoshimi.HybridAgents
 
                 hasReacted = true;
             }
-            if ( this._protectorNumber < 10 && !hasReacted)
+            if (this.getAASMAFramework().protectorsAlive() < 10 && !hasReacted)
             {
                 _nanoAI.StopMoving();
                 this._nanoAI.Build(typeof(HybridProtector), "P" + this._protectorNumber++);
                 hasReacted = true;
 
             }
-            if (this._explorerNumber < 10 && !hasReacted)
+            if (getAASMAFramework().explorersAlive() < 10 && !hasReacted)
             {
                 _nanoAI.StopMoving();
                 this._nanoAI.Build(typeof(HybridExplorer), "E" + this._explorerNumber++);
                 hasReacted = true;
 
             }
-            if (this._containerNumber < 10 && !hasReacted)
+            if (this.getAASMAFramework().containersAlive() < 10 && !hasReacted)
             {
                 _nanoAI.StopMoving();
                this._nanoAI.Build(typeof(HybridContainer), "C" + this._containerNumber++);

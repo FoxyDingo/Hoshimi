@@ -58,6 +58,12 @@ namespace AASMAHoshimi.COMHybridAgents
             {
 
                 Point p = Utils.getNearestPoint(this.Location, points);
+
+                AASMAMessage msg = new AASMAMessage(this.InternalName, "PIERRE");
+                msg.Tag = p;
+                //sendToAll(msg, "P");
+                getAASMAFramework().broadCastMessage(msg);
+
                 if (canShoot(p))
                 {
                     this.DefendTo(p, 1);
@@ -158,12 +164,27 @@ namespace AASMAHoshimi.COMHybridAgents
 
         public bool canShoot(Point p)
         {
-            double d = this.DefenseDistance + PH.Common.Utils.ScanLength;
+            double d = this.DefenseDistance;
             return Utils.SquareDistance(p, this.Location) <= (d * d);
         }
 
         public override void receiveMessage(AASMAMessage msg) { }
 
+        //Sends msg to all nanobots of type s (E, C, P...)
+        public void sendToAll(AASMAMessage msg, string s)
+        {
+            foreach (NanoBot n in getAASMAFramework().NanoBots)
+            {
+                if (n.InternalName.StartsWith(s))
+                {
+                    getAASMAFramework().sendMessage(msg, n.InternalName);
+                    getAASMAFramework().logData(this, "sending msg to " + msg.Receiver + " : " + msg.Content);
+                }
+            }
+
+        }
+
     }
+
 }
 

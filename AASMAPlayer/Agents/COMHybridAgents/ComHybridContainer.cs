@@ -13,23 +13,27 @@ namespace AASMAHoshimi.COMHybridAgents
     {
         protected COMHybridAgent agent;
         private List<PlanCheckPoint> planCheckPoints = new List<PlanCheckPoint>();
-        private List<Point> AZNPoints = new List<Point>();
         private bool planIsFinished = true;
-
         //TODO
         private bool planImpossible = false;
-
         PlanCheckPoint currentInstruction = null;
+
+        private List<Point> aznPoints = new List<Point>();
+        private List<Point> emptyNeedles = new List<Point>();
+        private List<Point> aznPointsBroadcasted = new List<Point>();
+        private List<Point> fullNeedlesBroadcasted = new List<Point>();
+        private List<Point> emptyNeedlesBroadcasted = new List<Point>();
 
 
         public COMHybridContainer()
             : base()
         {
             //I'm only interested in AZN and EmptyNeedle and EnemyBot perceptions!!
-            int[] interests = new int[3];
+            int[] interests = new int[4];
             interests[0] = (int)PerceptionType.AZNPoint;
             interests[1] = (int)PerceptionType.EmptyNeedle;
-            interests[1] = (int)PerceptionType.EnemyBot;
+            interests[2] = (int)PerceptionType.FullNeedle;
+            interests[3] = (int)PerceptionType.EnemyBot;
             agent = new COMHybridAgent(interests);
         }
         public override void DoActions()
@@ -61,6 +65,12 @@ namespace AASMAHoshimi.COMHybridAgents
             if (points.Count > 0 && !hasReacted)
             {
                 Point p = Utils.getNearestPoint(this.Location, points);
+
+                AASMAMessage msg = new AASMAMessage(this.InternalName, "PIERRE");
+                msg.Tag = p;
+                //sendToAll(msg, "P");
+                getAASMAFramework().broadCastMessage(msg);
+
                 int awayVectorX = Location.X - p.X;
                 int awayVectorY = Location.Y - p.Y;
                 Point awayPoint = new Point(Location.X + awayVectorX / 2, Location.Y + awayVectorY / 2);
@@ -183,9 +193,9 @@ namespace AASMAHoshimi.COMHybridAgents
             }
             if (pointsCollect.Count > 0)
             {
-                List<Point> temp = new List<Point>(pointsCollect);
-                temp.AddRange(AZNPoints);
-                Point p = Utils.getNearestPoint(this.Location, temp);
+                //List<Point> temp = new List<Point>(pointsCollect);
+               // temp.AddRange(aznPoints);
+                Point p = Utils.getNearestPoint(this.Location, pointsCollect);
                 return new KeyValuePair<Desires, Point>(Desires.Collect, p);
             }
 
@@ -195,6 +205,18 @@ namespace AASMAHoshimi.COMHybridAgents
         public List<KeyValuePair<Desires, Point>> getDesires()
         {
             List<KeyValuePair<Desires, Point>> desires = new List<KeyValuePair<Desires, Point>>();
+            if (emptyNeedles.Count > 0 && this.Stock > 0)
+            {
+                Point point = Utils.getNearestPoint(this.Location, emptyNeedles);
+                desires.Add(new KeyValuePair<Desires, Point>(Desires.Unload, point));
+            }
+
+            if (aznPoints.Count > 0 && Stock < ContainerCapacity)
+            {
+                Point point = Utils.getNearestPoint(this.Location, aznPoints);
+                desires.Add(new KeyValuePair<Desires, Point>(Desires.Collect, point));
+            }
+                       
             List<Perception> perceptions = agent.getPerceptions(this, this.getAASMAFramework());
 
             foreach (Perception per in perceptions)
@@ -203,22 +225,59 @@ namespace AASMAHoshimi.COMHybridAgents
                 if (per.getType().Equals(PerceptionType.AZNPoint) && Stock < ContainerCapacity)
                 {
                     AZNPointPerception p = (AZNPointPerception)per;
-                    desires.Add(new KeyValuePair<Desires, Point>(Desires.Collect, p.getPoint()));
-                    if (!AZNPoints.Contains(p.getPoint()))
+                    Point point = p.getPoint();
+                    desires.Add(new KeyValuePair<Desires, Point>(Desires.Collect, point));
+                                        
+                    if (!aznPointsBroadcasted.Contains(point))
                     {
-                        AZNPoints.Add(p.getPoint());
+                        AASMAMessage msg = new AASMAMessage(this.InternalName, "AZN POINT");
+                        msg.Tag = point;
+                        aznPointsBroadcasted.Add(point);
+                        //sendToAll(msg, "C");
+                        getAASMAFramework().broadCastMessage(msg);
+                    }
+
+                    if (!aznPoints.Contains(p.getPoint()))
+                    {
+                        aznPoints.Add(p.getPoint());
                     }
                 }
                 //Unload AZN
                 if (per.getType().Equals(PerceptionType.EmptyNeedle) && this.Stock > 0)
                 {
                     EmptyNeedlePerception p = (EmptyNeedlePerception)per;
-                    desires.Add(new KeyValuePair<Desires, Point>(Desires.Unload, p.getPoint()));
+                    Point point = p.getPoint();
+                    desires.Add(new KeyValuePair<Desires, Point>(Desires.Unload, point));
+
+                    if (!emptyNeedlesBroadcasted.Contains(point))
+                    {
+                        AASMAMessage msg = new AASMAMessage(this.InternalName, "EMPTY NEEDLE");
+                        msg.Tag = point;
+                        emptyNeedlesBroadcasted.Add(point);
+                        //sendToAll(msg, "C");
+                        getAASMAFramework().broadCastMessage(msg);
+                    }
+                }
+
+                if (per.isType(PerceptionType.FullNeedle))
+                {
+                    FullNeedlePerception p = (FullNeedlePerception)per;
+                    Point point = p.getPoint();
+                    emptyNeedles.Remove(point);
+                    if (!fullNeedlesBroadcasted.Contains(point))
+                    {
+                        AASMAMessage msg = new AASMAMessage(this.InternalName, "FULL NEEDLE");
+                        msg.Tag = point;
+                        fullNeedlesBroadcasted.Add(point);
+                        //sendToAll(msg, "C");
+                        getAASMAFramework().broadCastMessage(msg);
+                    }
                 }
 
 
             }
 
+            
             return desires;
         }
 
@@ -241,7 +300,67 @@ namespace AASMAHoshimi.COMHybridAgents
             }
 
         }
-        public override void receiveMessage(AASMAMessage msg) { }
+        
+        public override void receiveMessage(AASMAMessage msg) 
+        {
+           /* if(!msg.Sender.Equals(this.InternalName))
+            {*/
+
+            getAASMAFramework().logData(this, "received message from " + msg.Sender + " : " + msg.Content);
+
+                if (msg.Content.Equals("AZN POINT"))
+                {
+                    Point p = (Point)msg.Tag;
+                    if (!aznPoints.Contains(p))
+                    {
+                        aznPoints.Add(p);
+                    }
+                    if (!aznPointsBroadcasted.Contains(p))
+                    {
+                        aznPointsBroadcasted.Add(p);
+                    }
+                }
+                if (msg.Content.Equals("FULL NEEDLE"))
+                {
+                    Point p = (Point)msg.Tag;
+                    if (emptyNeedles.Contains(p))
+                    {
+                        emptyNeedles.Remove(p);
+                    }
+                    if (!fullNeedlesBroadcasted.Contains(p))
+                    {
+                        fullNeedlesBroadcasted.Add(p);
+                    }
+                }
+                if (msg.Content.Equals("EMPTY NEEDLE"))
+                {
+                    Point p = (Point)msg.Tag;
+                    if (!emptyNeedles.Contains(p))
+                    {
+                        emptyNeedles.Add(p);
+                    }
+                    if (!emptyNeedlesBroadcasted.Contains(p))
+                    {
+                        emptyNeedlesBroadcasted.Add(p);
+                    }
+                }
+           // }
+            
+        }
+
+        //Sends msg to all nanobots of type s (E, C, P...)
+        public void sendToAll(AASMAMessage msg, string s)
+        {
+            foreach (NanoBot n in getAASMAFramework().NanoBots)
+            {
+                if (n.InternalName.StartsWith(s))
+                {
+                    getAASMAFramework().sendMessage(msg, n.InternalName);
+                    getAASMAFramework().logData(this, "sending msg to " + msg.Receiver + " : " + msg.Content);
+                }
+            }
+
+        }
 
     }
 }

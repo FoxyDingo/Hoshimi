@@ -96,23 +96,6 @@ namespace AASMAHoshimi.ISCommunicativeAgents
 
                 }
 
-                // **** DEBUG ONLY ****
-                if (!_hasHoshimies)
-                {
-                    AASMAMessage msg = new AASMAMessage(this.InternalName, "I DONT HAVE MORE HOSHIMIES");
-                    getAASMAFramework().sendMessage(msg, "AI");
-                }
-                else
-                {
-
-                    AASMAMessage msg = new AASMAMessage(this.InternalName, "I still have hoshimies to broadcast");
-                    getAASMAFramework().sendMessage(msg, "AI");
-                }
-                /// ****** ////
-
-
-
-
             }
 
             // GO TO NAV POINT

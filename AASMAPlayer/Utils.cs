@@ -344,5 +344,20 @@ namespace AASMAHoshimi
            
         }
 
+        //DOES NOT WORK WITH AI
+        //Sends msg to all nanobots of type s (E, C, P...)
+        public void sendToAll(NanoBot bot, AASMAPlayer player,  AASMAMessage msg, string s)
+        {
+            foreach (NanoBot n in player.NanoBots)
+            {
+                if (n.InternalName.StartsWith(s))
+                {
+                    player.sendMessage(msg, n.InternalName);
+                    player.logData(bot, "sending msg to " + msg.Receiver + " : " + msg.Content);
+                }
+            }
+
+        }
+
     }
 }

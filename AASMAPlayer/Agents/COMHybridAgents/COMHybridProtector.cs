@@ -14,13 +14,14 @@ namespace AASMAHoshimi.COMHybridAgents
     {
         protected COMHybridAgent agent;
         private List<PlanCheckPoint> planCheckPoints = new List<PlanCheckPoint>();
-
         private bool planIsFinished = true;
-
         //TODO
         private bool planImpossible = false;
-
         PlanCheckPoint currentInstruction = null;
+
+        private List<Point>  pierresToShoot = new List<Point>();
+        private bool protect = false;
+        private Point protectPoint;
 
         public COMHybridProtector()
             : base()
@@ -43,12 +44,12 @@ namespace AASMAHoshimi.COMHybridAgents
 
                         KeyValuePair<Desires, Point> intention = deliberate(desires);
                         plan(intention);
-                        getAASMAFramework().logData(this, "I am executing intention " + intention.Key);
+                   //     getAASMAFramework().logData(this, "I am executing intention " + intention.Key);
                         execute();
                     }
                     else
                     {
-                        getAASMAFramework().logData(this, "Doing a step of the plan");
+                    //    getAASMAFramework().logData(this, "Doing a step of the plan");
                         execute();
                     }
                 }
@@ -71,9 +72,13 @@ namespace AASMAHoshimi.COMHybridAgents
             if (points.Count > 0 && !hasReacted)
             {
                 Point p = Utils.getNearestPoint(this.Location, points);
+                AASMAMessage msg = new AASMAMessage(this.InternalName, "PIERRE");
+                msg.Tag = p;
+                sendToAll(msg, "P");
+
                 if (canShoot(p))
                 {
-                    getAASMAFramework().logData(this, "REACT: I WANNA SHOOT " + p);
+                  //  getAASMAFramework().logData(this, "REACT: I WANNA SHOOT " + p);
                     StopMoving();
 
                     if (!this.DefendTo(p, 1))
@@ -85,8 +90,39 @@ namespace AASMAHoshimi.COMHybridAgents
                     }
                     hasReacted = true;
                 }
+            }
 
+            if (pierresToShoot.Count > 0 && !hasReacted)
+            {
+                do
+	            {
+	                Point p = Utils.getNearestPoint(this.Location, pierresToShoot);
+                    pierresToShoot.Remove(p);
+                    if (canShoot(p))
+                    {
+                   //     getAASMAFramework().logData(this, "REACT: I WANNA SHOOT " + p);
+                        StopMoving();
 
+                        if (!this.DefendTo(p, 1))
+                        {
+                            Point[] pointBetween = new Point[2];
+                            pointBetween[0] = Location;
+                            pointBetween[1] = p;
+                            MoveTo(Utils.getValidPoint(this.PlayerOwner.Tissue, Utils.getMiddlePoint(pointBetween)));
+                        }
+                        hasReacted = true;
+                    }
+	                
+	            } while (pierresToShoot.Count > 0 && !hasReacted);
+                    //pierresToShoot only stay here for one turn
+                    pierresToShoot.Clear();
+            }
+
+            if (protect && !hasReacted)
+            {
+                this.StopMoving();
+                this.MoveTo(protectPoint);
+                hasReacted = true;
             }
 
             //We want the agent to follow the plan that he stopped when reacting
@@ -209,7 +245,7 @@ namespace AASMAHoshimi.COMHybridAgents
 
         public bool canShoot(Point p)
         {
-            double d = this.DefenseDistance + PH.Common.Utils.ScanLength;
+            double d = this.DefenseDistance;
             return Utils.SquareDistance(p, this.Location) <= (d * d);
         }
 
@@ -234,7 +270,43 @@ namespace AASMAHoshimi.COMHybridAgents
         }
 
 
-        public override void receiveMessage(AASMAMessage msg) { }
+        public override void receiveMessage(AASMAMessage msg) 
+        {
+           /* if (!msg.Sender.Equals(this.InternalName))
+            {*/
+                if(msg.Content.Equals("PIERRE"))
+                {
+                    Point point = (Point) msg.Tag;
+                    if (!pierresToShoot.Contains(point))
+                    {
+                        pierresToShoot.Add(point);
+                    }
+                    
+                }
+
+                if (msg.Content.Equals("PROTECT"))
+                {
+                    Point point = (Point)msg.Tag;
+                    this.protect = true;
+                    this.protectPoint = point;
+
+                }
+          //  }
+        }
+
+        //Sends msg to all nanobots of type s (E, C, P...)
+        public void sendToAll(AASMAMessage msg, string s)
+        {
+            foreach (NanoBot n in getAASMAFramework().NanoBots)
+            {
+                if (n.InternalName.StartsWith(s))
+                {
+                    getAASMAFramework().sendMessage(msg, n.InternalName);
+                    getAASMAFramework().logData(this, "sending msg to " + msg.Receiver + " : " + msg.Content);
+                }
+            }
+
+        }
     }
 }
 

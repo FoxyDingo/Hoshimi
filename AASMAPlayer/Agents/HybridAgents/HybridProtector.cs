@@ -209,7 +209,7 @@ namespace AASMAHoshimi.HybridAgents
 
         public bool canShoot(Point p)
         {
-            double d = this.DefenseDistance + PH.Common.Utils.ScanLength;
+            double d = this.DefenseDistance;
             return Utils.SquareDistance(p, this.Location) <= (d * d);
         }
 
