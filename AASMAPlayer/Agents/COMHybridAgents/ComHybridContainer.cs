@@ -1,47 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Drawing;
 using PH.Common;
+using System.Drawing;
 
-namespace AASMAHoshimi.HybridAgents
+
+namespace AASMAHoshimi.COMHybridAgents
 {
 
-    [Characteristics(ContainerCapacity = 0, CollectTransfertSpeed = 0, Scan = 30, MaxDamage = 0, DefenseDistance = 0, Constitution = 10)]
-    public class HybridExplorer : AASMAExplorer
+    [Characteristics(ContainerCapacity = 50, CollectTransfertSpeed = 5, Scan = 0, MaxDamage = 0, DefenseDistance = 0, Constitution = 15)]
+    class COMHybridContainer : AASMAContainer
     {
-        protected HybridAgent agent;
+        protected COMHybridAgent agent;
         private List<PlanCheckPoint> planCheckPoints = new List<PlanCheckPoint>();
+        private List<Point> AZNPoints = new List<Point>();
         private bool planIsFinished = true;
-        private List<Point> navPointsVisited = new List<Point>();
+
         //TODO
         private bool planImpossible = false;
+
         PlanCheckPoint currentInstruction = null;
 
-        private List<Point> hoshimiesBroadcasted = new List<Point>();
-        private List<Point> navPointsBroadcasted = new List<Point>();
-        private List<Point> aznPointsBroadcasted = new List<Point>();
 
-        public HybridExplorer()
+        public COMHybridContainer()
             : base()
         {
-            //I'm only interested in NavPoint and EnemyBot perceptions!!
-            int[] interests = new int[2];
-            interests[0] = (int)PerceptionType.NavPoint;
+            //I'm only interested in AZN and EmptyNeedle and EnemyBot perceptions!!
+            int[] interests = new int[3];
+            interests[0] = (int)PerceptionType.AZNPoint;
+            interests[1] = (int)PerceptionType.EmptyNeedle;
             interests[1] = (int)PerceptionType.EnemyBot;
-            agent = new HybridAgent(interests);
+            agent = new COMHybridAgent(interests);
         }
-
-
         public override void DoActions()
         {
-
             if (!React())
             {
-
+                List<KeyValuePair<Desires, Point>> desires = getDesires();
                 if (planIsFinished || planImpossible)
                 {
-                    List<KeyValuePair<Desires, Point>> desires = getDesires();
+
                     KeyValuePair<Desires, Point> intention = deliberate(desires);
                     plan(intention);
                     execute();
@@ -52,6 +50,7 @@ namespace AASMAHoshimi.HybridAgents
                     execute();
                 }
             }
+
         }
 
         public bool React()
@@ -72,7 +71,7 @@ namespace AASMAHoshimi.HybridAgents
 
                 hasReacted = true;
             }
-            
+
             //We want the agent to follow the plan that he stopped when reacting
             if (hasReacted)
             {
@@ -86,36 +85,25 @@ namespace AASMAHoshimi.HybridAgents
             return false;
         }
 
-
-
         public void execute()
         {
             if (this.State.Equals(NanoBotState.WaitingOrders))
             {
-                //here currentInstruction is actually last instruction made
-                if (currentInstruction != null)
-                {
-                    if (currentInstruction.action.Equals(PlanCheckPoint.Actions.Move) && currentInstruction.intention.Equals(Desires.Explore))
-                    {
-                        if (this.Location.Equals(currentInstruction.location))
-                        {
-                            navPointsVisited.Add(this.Location);
-                        }
-                    }
-                }
 
                 if (planCheckPoints.Count == 0)
                 {
                     planIsFinished = true;
                     return;
                 }
+
                 currentInstruction = planCheckPoints[0];
+                //getAASMAFramework().logData(this, "I have an instruction " + currentInstruction.action);
                 planCheckPoints.RemoveAt(0);
             }
 
             switch (currentInstruction.action)
             {
-                
+
                 case PlanCheckPoint.Actions.Move:
                     if (this.State.Equals(NanoBotState.WaitingOrders))
                     {
@@ -123,6 +111,21 @@ namespace AASMAHoshimi.HybridAgents
                     }
 
                     break;
+                case PlanCheckPoint.Actions.Collect:
+                    // getAASMAFramework().logData(this, "I'm gonna colect");
+                    if (this.State.Equals(NanoBotState.WaitingOrders))
+                    {
+                        int turns = (ContainerCapacity - Stock) / 5;
+                        this.CollectFrom(this.Location, turns);
+                    }
+                    break;
+                case PlanCheckPoint.Actions.Unload:
+                    if (this.State.Equals(NanoBotState.WaitingOrders))
+                    {
+                        this.TransferTo(this.Location, 5);
+                    }
+                    break;
+
                 case PlanCheckPoint.Actions.MoveRandom:
                     if (this.State.Equals(NanoBotState.WaitingOrders))
                     {
@@ -139,13 +142,19 @@ namespace AASMAHoshimi.HybridAgents
 
             switch (intention.Key)
             {
-                
+
                 case Desires.None:
                     planCheckPoints.Add(new PlanCheckPoint(this.Location, PlanCheckPoint.Actions.MoveRandom));
                     planIsFinished = false;
                     break;
-                case Desires.Explore:
-                    planCheckPoints.Add(new PlanCheckPoint(intention.Value, PlanCheckPoint.Actions.Move, Desires.Explore));
+                case Desires.Collect:
+                    planCheckPoints.Add(new PlanCheckPoint(intention.Value, PlanCheckPoint.Actions.Move));
+                    planCheckPoints.Add(new PlanCheckPoint(intention.Value, PlanCheckPoint.Actions.Collect));
+                    planIsFinished = false;
+                    break;
+                case Desires.Unload:
+                    planCheckPoints.Add(new PlanCheckPoint(intention.Value, PlanCheckPoint.Actions.Move));
+                    planCheckPoints.Add(new PlanCheckPoint(intention.Value, PlanCheckPoint.Actions.Unload));
                     planIsFinished = false;
                     break;
             }
@@ -153,20 +162,33 @@ namespace AASMAHoshimi.HybridAgents
 
         public KeyValuePair<Desires, Point> deliberate(List<KeyValuePair<Desires, Point>> desires)
         {
-            List<Point> points = new List<Point>();
+            List<Point> pointsUnload = new List<Point>();
+            List<Point> pointsCollect = new List<Point>();
             foreach (KeyValuePair<Desires, Point> desire in desires)
             {
-                
-                if (desire.Key.Equals(Desires.Explore))
+
+                if (desire.Key.Equals(Desires.Unload))
                 {
-                    points.Add(desire.Value);
+                    pointsUnload.Add(desire.Value);
+                }
+                if (desire.Key.Equals(Desires.Collect))
+                {
+                    pointsCollect.Add(desire.Value);
                 }
             }
-            if (points.Count > 0)
+            if (pointsUnload.Count > 0)
             {
-                Point p = Utils.getNearestPoint(this.Location, points);
-                return new KeyValuePair<Desires, Point>(Desires.Explore, p);
+                Point p = Utils.getNearestPoint(this.Location, pointsUnload);
+                return new KeyValuePair<Desires, Point>(Desires.Unload, p);
             }
+            if (pointsCollect.Count > 0)
+            {
+                List<Point> temp = new List<Point>(pointsCollect);
+                temp.AddRange(AZNPoints);
+                Point p = Utils.getNearestPoint(this.Location, temp);
+                return new KeyValuePair<Desires, Point>(Desires.Collect, p);
+            }
+
             return new KeyValuePair<Desires, Point>(Desires.None, new Point());
         }
 
@@ -177,16 +199,24 @@ namespace AASMAHoshimi.HybridAgents
 
             foreach (Perception per in perceptions)
             {
-               
-                if (per.getType().Equals(PerceptionType.NavPoint))
+                //Collect AZN
+                if (per.getType().Equals(PerceptionType.AZNPoint) && Stock < ContainerCapacity)
                 {
-                    NavPointPerception p = (NavPointPerception)per;
-                    if (!navPointsVisited.Contains(p.getPoint()))
+                    AZNPointPerception p = (AZNPointPerception)per;
+                    desires.Add(new KeyValuePair<Desires, Point>(Desires.Collect, p.getPoint()));
+                    if (!AZNPoints.Contains(p.getPoint()))
                     {
-                        desires.Add(new KeyValuePair<Desires, Point>(Desires.Explore, p.getPoint()));
+                        AZNPoints.Add(p.getPoint());
                     }
-
                 }
+                //Unload AZN
+                if (per.getType().Equals(PerceptionType.EmptyNeedle) && this.Stock > 0)
+                {
+                    EmptyNeedlePerception p = (EmptyNeedlePerception)per;
+                    desires.Add(new KeyValuePair<Desires, Point>(Desires.Unload, p.getPoint()));
+                }
+
+
             }
 
             return desires;
@@ -211,7 +241,8 @@ namespace AASMAHoshimi.HybridAgents
             }
 
         }
-
         public override void receiveMessage(AASMAMessage msg) { }
+
     }
 }
+

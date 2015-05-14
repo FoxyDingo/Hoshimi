@@ -4,32 +4,30 @@ using System.Text;
 using System.Drawing;
 using PH.Common;
 
-namespace AASMAHoshimi.HybridAgents
+namespace AASMAHoshimi.COMHybridAgents
 {
 
     [Characteristics(ContainerCapacity = 0, CollectTransfertSpeed = 0, Scan = 30, MaxDamage = 0, DefenseDistance = 0, Constitution = 10)]
-    public class HybridExplorer : AASMAExplorer
+    public class COMHybridExplorer : AASMAExplorer
     {
-        protected HybridAgent agent;
+        protected COMHybridAgent agent;
         private List<PlanCheckPoint> planCheckPoints = new List<PlanCheckPoint>();
-        private bool planIsFinished = true;
         private List<Point> navPointsVisited = new List<Point>();
+        private bool planIsFinished = true;
+
         //TODO
         private bool planImpossible = false;
+
         PlanCheckPoint currentInstruction = null;
 
-        private List<Point> hoshimiesBroadcasted = new List<Point>();
-        private List<Point> navPointsBroadcasted = new List<Point>();
-        private List<Point> aznPointsBroadcasted = new List<Point>();
-
-        public HybridExplorer()
+        public COMHybridExplorer()
             : base()
         {
             //I'm only interested in NavPoint and EnemyBot perceptions!!
             int[] interests = new int[2];
             interests[0] = (int)PerceptionType.NavPoint;
             interests[1] = (int)PerceptionType.EnemyBot;
-            agent = new HybridAgent(interests);
+            agent = new COMHybridAgent(interests);
         }
 
 
@@ -72,7 +70,7 @@ namespace AASMAHoshimi.HybridAgents
 
                 hasReacted = true;
             }
-            
+
             //We want the agent to follow the plan that he stopped when reacting
             if (hasReacted)
             {
@@ -115,7 +113,7 @@ namespace AASMAHoshimi.HybridAgents
 
             switch (currentInstruction.action)
             {
-                
+
                 case PlanCheckPoint.Actions.Move:
                     if (this.State.Equals(NanoBotState.WaitingOrders))
                     {
@@ -139,7 +137,7 @@ namespace AASMAHoshimi.HybridAgents
 
             switch (intention.Key)
             {
-                
+
                 case Desires.None:
                     planCheckPoints.Add(new PlanCheckPoint(this.Location, PlanCheckPoint.Actions.MoveRandom));
                     planIsFinished = false;
@@ -156,7 +154,7 @@ namespace AASMAHoshimi.HybridAgents
             List<Point> points = new List<Point>();
             foreach (KeyValuePair<Desires, Point> desire in desires)
             {
-                
+
                 if (desire.Key.Equals(Desires.Explore))
                 {
                     points.Add(desire.Value);
@@ -177,7 +175,7 @@ namespace AASMAHoshimi.HybridAgents
 
             foreach (Perception per in perceptions)
             {
-               
+
                 if (per.getType().Equals(PerceptionType.NavPoint))
                 {
                     NavPointPerception p = (NavPointPerception)per;

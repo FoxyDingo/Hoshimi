@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace AASMAHoshimi.HybridAgents
 {
-    //public delegate void AgentAction(object body, PerceptMemory perceptMemory);
+    
 
     
 

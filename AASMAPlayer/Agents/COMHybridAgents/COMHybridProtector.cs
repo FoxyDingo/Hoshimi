@@ -4,75 +4,91 @@ using System.Text;
 using System.Drawing;
 using PH.Common;
 
-namespace AASMAHoshimi.HybridAgents
+namespace AASMAHoshimi.COMHybridAgents
 {
 
-    [Characteristics(ContainerCapacity = 0, CollectTransfertSpeed = 0, Scan = 30, MaxDamage = 0, DefenseDistance = 0, Constitution = 10)]
-    public class HybridExplorer : AASMAExplorer
+    //however, it is frequent that pierre's neurocontrollers kill the protector before he sees it
+    //note that the shooting range is greater than the scan range
+    [Characteristics(ContainerCapacity = 0, CollectTransfertSpeed = 0, Scan = 5, MaxDamage = 5, DefenseDistance = 12, Constitution = 28)]
+    public class COMHybridProtector : AASMAProtector
     {
-        protected HybridAgent agent;
+        protected COMHybridAgent agent;
         private List<PlanCheckPoint> planCheckPoints = new List<PlanCheckPoint>();
+
         private bool planIsFinished = true;
-        private List<Point> navPointsVisited = new List<Point>();
+
         //TODO
         private bool planImpossible = false;
+
         PlanCheckPoint currentInstruction = null;
 
-        private List<Point> hoshimiesBroadcasted = new List<Point>();
-        private List<Point> navPointsBroadcasted = new List<Point>();
-        private List<Point> aznPointsBroadcasted = new List<Point>();
-
-        public HybridExplorer()
+        public COMHybridProtector()
             : base()
         {
-            //I'm only interested in NavPoint and EnemyBot perceptions!!
-            int[] interests = new int[2];
-            interests[0] = (int)PerceptionType.NavPoint;
-            interests[1] = (int)PerceptionType.EnemyBot;
-            agent = new HybridAgent(interests);
+            //I'm only interested in EnemyBot perceptions!!
+            int[] interests = new int[1];
+            interests[0] = (int)PerceptionType.EnemyBot;
+            agent = new COMHybridAgent(interests);
         }
-
 
         public override void DoActions()
         {
-
-            if (!React())
+            try
             {
-
-                if (planIsFinished || planImpossible)
+                if (!React())
                 {
                     List<KeyValuePair<Desires, Point>> desires = getDesires();
-                    KeyValuePair<Desires, Point> intention = deliberate(desires);
-                    plan(intention);
-                    execute();
-                }
-                else
-                {
+                    if (planIsFinished || planImpossible)
+                    {
 
-                    execute();
+                        KeyValuePair<Desires, Point> intention = deliberate(desires);
+                        plan(intention);
+                        getAASMAFramework().logData(this, "I am executing intention " + intention.Key);
+                        execute();
+                    }
+                    else
+                    {
+                        getAASMAFramework().logData(this, "Doing a step of the plan");
+                        execute();
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                getAASMAFramework().logData(this, "EXC " + e.Message);
+            }
+
+
+
+
         }
 
         public bool React()
         {
             bool hasReacted = false;
-            //RUN AWAY FROM PIERRES
+            //Shoot PIERRES
             List<Point> points = getAASMAFramework().visiblePierres(this);
             if (points.Count > 0 && !hasReacted)
             {
                 Point p = Utils.getNearestPoint(this.Location, points);
-                int awayVectorX = Location.X - p.X;
-                int awayVectorY = Location.Y - p.Y;
-                Point awayPoint = new Point(Location.X + awayVectorX / 2, Location.Y + awayVectorY / 2);
-                Point validAwayPoint = Utils.getValidPoint(getAASMAFramework().Tissue, awayPoint);
+                if (canShoot(p))
+                {
+                    getAASMAFramework().logData(this, "REACT: I WANNA SHOOT " + p);
+                    StopMoving();
 
-                StopMoving();
-                MoveTo(validAwayPoint);
+                    if (!this.DefendTo(p, 1))
+                    {
+                        Point[] pointBetween = new Point[2];
+                        pointBetween[0] = Location;
+                        pointBetween[1] = p;
+                        MoveTo(Utils.getValidPoint(this.PlayerOwner.Tissue, Utils.getMiddlePoint(pointBetween)));
+                    }
+                    hasReacted = true;
+                }
 
-                hasReacted = true;
+
             }
-            
+
             //We want the agent to follow the plan that he stopped when reacting
             if (hasReacted)
             {
@@ -86,24 +102,10 @@ namespace AASMAHoshimi.HybridAgents
             return false;
         }
 
-
-
         public void execute()
         {
             if (this.State.Equals(NanoBotState.WaitingOrders))
             {
-                //here currentInstruction is actually last instruction made
-                if (currentInstruction != null)
-                {
-                    if (currentInstruction.action.Equals(PlanCheckPoint.Actions.Move) && currentInstruction.intention.Equals(Desires.Explore))
-                    {
-                        if (this.Location.Equals(currentInstruction.location))
-                        {
-                            navPointsVisited.Add(this.Location);
-                        }
-                    }
-                }
-
                 if (planCheckPoints.Count == 0)
                 {
                     planIsFinished = true;
@@ -115,13 +117,18 @@ namespace AASMAHoshimi.HybridAgents
 
             switch (currentInstruction.action)
             {
-                
                 case PlanCheckPoint.Actions.Move:
                     if (this.State.Equals(NanoBotState.WaitingOrders))
                     {
                         this.MoveTo(currentInstruction.location);
                     }
 
+                    break;
+                case PlanCheckPoint.Actions.Attack:
+                    if (this.State.Equals(NanoBotState.WaitingOrders))
+                    {
+                        this.DefendTo(currentInstruction.location, 3);
+                    }
                     break;
                 case PlanCheckPoint.Actions.MoveRandom:
                     if (this.State.Equals(NanoBotState.WaitingOrders))
@@ -139,15 +146,29 @@ namespace AASMAHoshimi.HybridAgents
 
             switch (intention.Key)
             {
-                
                 case Desires.None:
                     planCheckPoints.Add(new PlanCheckPoint(this.Location, PlanCheckPoint.Actions.MoveRandom));
                     planIsFinished = false;
                     break;
-                case Desires.Explore:
-                    planCheckPoints.Add(new PlanCheckPoint(intention.Value, PlanCheckPoint.Actions.Move, Desires.Explore));
-                    planIsFinished = false;
-                    break;
+                case Desires.Attack:
+                    if (canShoot(intention.Value))
+                    {
+                        planCheckPoints.Add(new PlanCheckPoint(intention.Value, PlanCheckPoint.Actions.Attack));
+                        planIsFinished = false;
+                        break;
+
+                    }
+                    else
+                    {
+                        //If we cant shoot it we just move to the halfway point
+                        Point[] points = new Point[2];
+                        points[0] = this.Location;
+                        points[1] = intention.Value;
+                        planCheckPoints.Add(new PlanCheckPoint(Utils.getValidPoint(this.getAASMAFramework().Tissue, Utils.getMiddlePoint(points)), PlanCheckPoint.Actions.Move));
+                        planIsFinished = false;
+                        break;
+                    }
+
             }
         }
 
@@ -156,8 +177,7 @@ namespace AASMAHoshimi.HybridAgents
             List<Point> points = new List<Point>();
             foreach (KeyValuePair<Desires, Point> desire in desires)
             {
-                
-                if (desire.Key.Equals(Desires.Explore))
+                if (desire.Key.Equals(Desires.Attack))
                 {
                     points.Add(desire.Value);
                 }
@@ -165,7 +185,7 @@ namespace AASMAHoshimi.HybridAgents
             if (points.Count > 0)
             {
                 Point p = Utils.getNearestPoint(this.Location, points);
-                return new KeyValuePair<Desires, Point>(Desires.Explore, p);
+                return new KeyValuePair<Desires, Point>(Desires.Attack, p);
             }
             return new KeyValuePair<Desires, Point>(Desires.None, new Point());
         }
@@ -177,19 +197,20 @@ namespace AASMAHoshimi.HybridAgents
 
             foreach (Perception per in perceptions)
             {
-               
-                if (per.getType().Equals(PerceptionType.NavPoint))
+                if (per.getType().Equals(PerceptionType.EnemyBot))
                 {
-                    NavPointPerception p = (NavPointPerception)per;
-                    if (!navPointsVisited.Contains(p.getPoint()))
-                    {
-                        desires.Add(new KeyValuePair<Desires, Point>(Desires.Explore, p.getPoint()));
-                    }
-
+                    EnemyBotPerception p = (EnemyBotPerception)per;
+                    desires.Add(new KeyValuePair<Desires, Point>(Desires.Attack, p.getPoint()));
                 }
             }
 
             return desires;
+        }
+
+        public bool canShoot(Point p)
+        {
+            double d = this.DefenseDistance + PH.Common.Utils.ScanLength;
+            return Utils.SquareDistance(p, this.Location) <= (d * d);
         }
 
         public void moveRandom()
@@ -212,6 +233,8 @@ namespace AASMAHoshimi.HybridAgents
 
         }
 
+
         public override void receiveMessage(AASMAMessage msg) { }
     }
 }
+

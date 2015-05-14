@@ -4,19 +4,19 @@ using System.Text;
 using PH.Common;
 using System.Drawing;
 
-namespace AASMAHoshimi.DeliberativeAgents
+namespace AASMAHoshimi.COMHybridAgents
 {
- 
-
     
-    public class DeliberativeAgent : Agent
+
+
+    public class COMHybridAgent : Agent
     {
 
-        public DeliberativeAgent()
+        public COMHybridAgent()
             : base()
         { }
 
-        public DeliberativeAgent(int[] interests)
+        public COMHybridAgent(int[] interests)
             : base(interests)
         { }
 
@@ -32,3 +32,4 @@ namespace AASMAHoshimi.DeliberativeAgents
 
     }
 }
+
