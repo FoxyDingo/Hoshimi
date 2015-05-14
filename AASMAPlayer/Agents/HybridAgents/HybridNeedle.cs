@@ -4,14 +4,14 @@ using System.Text;
 using PH.Common;
 using System.Drawing;
 
-namespace AASMAHoshimi.DeliberativeAgents
+namespace AASMAHoshimi.HybridAgents
 {
     [Characteristics(ContainerCapacity = 100, CollectTransfertSpeed = 0, Scan = 10, MaxDamage = 5, DefenseDistance = 10, Constitution = 25)]
-    public class DeliberativeNeedle : AASMANeedle
+    public class HybridNeedle : AASMANeedle
     {
-        protected DeliberativeAgent agent;
+        protected HybridAgent agent;
         private List<PlanCheckPoint> planCheckPoints = new List<PlanCheckPoint>();
-        
+
         private bool planIsFinished = true;
 
         //TODO
@@ -19,17 +19,20 @@ namespace AASMAHoshimi.DeliberativeAgents
 
         PlanCheckPoint currentInstruction = null;
 
-        public DeliberativeNeedle() : base() 
+        public HybridNeedle()
+            : base()
         {
             //I'm only interested in EnemyBot perceptions!!
             int[] interests = new int[1];
             interests[0] = (int)PerceptionType.EnemyBot;
-            agent = new DeliberativeAgent(interests);
+            agent = new HybridAgent(interests);
         }
 
         public override void DoActions()
         {
-            List<KeyValuePair<Desires, Point>> desires = getDesires();
+            if (!React())
+            {
+                List<KeyValuePair<Desires, Point>> desires = getDesires();
                 if (planIsFinished || planImpossible)
                 {
 
@@ -43,6 +46,39 @@ namespace AASMAHoshimi.DeliberativeAgents
                     execute();
                 }
             }
+            
+        }
+
+        public bool React()
+        {
+            bool hasReacted = false;
+            //Shoot PIERRES
+            List<Point> points = getAASMAFramework().visiblePierres(this);
+            if (points.Count > 0 && !hasReacted)
+            {
+               
+                Point p = Utils.getNearestPoint(this.Location, points);
+                if (canShoot(p))
+                {
+                    this.DefendTo(p, 1);
+                    hasReacted = true;
+                }
+
+
+            }
+
+            //We want the agent to follow the plan that he stopped when reacting
+            if (hasReacted)
+            {
+                if (currentInstruction != null)
+                {
+                    planCheckPoints.Insert(0, currentInstruction);
+                }
+                return true;
+            }
+
+            return false;
+        }
 
         public void execute()
         {
@@ -65,7 +101,7 @@ namespace AASMAHoshimi.DeliberativeAgents
                         this.DefendTo(currentInstruction.location, 1);
                     }
                     break;
-               
+
             }
         }
 
@@ -75,7 +111,7 @@ namespace AASMAHoshimi.DeliberativeAgents
 
             switch (intention.Key)
             {
-                 case Desires.Attack:
+                case Desires.Attack:
                     if (canShoot(intention.Value))
                     {
                         planCheckPoints.Add(new PlanCheckPoint(intention.Value, PlanCheckPoint.Actions.Attack));
@@ -127,6 +163,6 @@ namespace AASMAHoshimi.DeliberativeAgents
         }
 
         public override void receiveMessage(AASMAMessage msg) { }
-        
+
     }
 }

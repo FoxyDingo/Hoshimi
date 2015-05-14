@@ -29,7 +29,14 @@ namespace AASMAHoshimi.ISCommunicativeAgents
                 {
                     //the defendTo commands fires to the specified position for a number of specified turns. 1 is the recommended number of turns.
 
-                    this.DefendTo(enemyPosition, 1);
+                    if (!this.DefendTo(enemyPosition, 1))
+                    {
+                        Point[] pointBetween = new Point[2];
+                        pointBetween[0] = Location;
+                        pointBetween[1] = enemyPosition;
+                        MoveTo(Utils.getValidPoint(this.PlayerOwner.Tissue, Utils.getMiddlePoint(pointBetween)));
+                    }
+                    
                 }
             }
 

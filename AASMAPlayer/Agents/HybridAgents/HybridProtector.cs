@@ -4,17 +4,17 @@ using System.Text;
 using System.Drawing;
 using PH.Common;
 
-namespace AASMAHoshimi.DeliberativeAgents
+namespace AASMAHoshimi.HybridAgents
 {
 
     //however, it is frequent that pierre's neurocontrollers kill the protector before he sees it
     //note that the shooting range is greater than the scan range
     [Characteristics(ContainerCapacity = 0, CollectTransfertSpeed = 0, Scan = 5, MaxDamage = 5, DefenseDistance = 12, Constitution = 28)]
-    public class DeliberativeProtector : AASMAProtector
+    public class HybridProtector : AASMAProtector
     {
-        protected DeliberativeAgent agent;
+        protected HybridAgent agent;
         private List<PlanCheckPoint> planCheckPoints = new List<PlanCheckPoint>();
-        
+
         private bool planIsFinished = true;
 
         //TODO
@@ -22,37 +22,84 @@ namespace AASMAHoshimi.DeliberativeAgents
 
         PlanCheckPoint currentInstruction = null;
 
-        public DeliberativeProtector()
+        public HybridProtector()
             : base()
         {
             //I'm only interested in EnemyBot perceptions!!
             int[] interests = new int[1];
             interests[0] = (int)PerceptionType.EnemyBot;
-            agent = new DeliberativeAgent(interests);
+            agent = new HybridAgent(interests);
         }
 
         public override void DoActions()
         {
             try
             {
-                List<KeyValuePair<Desires, Point>> desires = getDesires();
-                if (planIsFinished || planImpossible)
+                if (!React())
                 {
+                    List<KeyValuePair<Desires, Point>> desires = getDesires();
+                    if (planIsFinished || planImpossible)
+                    {
 
-                    KeyValuePair<Desires, Point> intention = deliberate(desires);
-                    plan(intention);
-                    execute();
-                }
-                else
-                {
-
-                    execute();
+                        KeyValuePair<Desires, Point> intention = deliberate(desires);
+                        plan(intention);
+                        getAASMAFramework().logData(this, "I am executing intention " + intention.Key);
+                        execute();
+                    }
+                    else
+                    {
+                        getAASMAFramework().logData(this, "Doing a step of the plan" );
+                        execute();
+                    }
                 }
             }
             catch (Exception e)
             {
-                getAASMAFramework().logData(this, "EXC" + e.Message);
+                getAASMAFramework().logData(this, "EXC " + e.Message);
             }
+           
+            
+                
+          
+        }
+
+        public bool React()
+        {
+            bool hasReacted = false;
+            //Shoot PIERRES
+            List<Point> points = getAASMAFramework().visiblePierres(this);
+            if (points.Count > 0 && !hasReacted)
+            {
+                Point p = Utils.getNearestPoint(this.Location, points);
+                if (canShoot(p))
+                {
+                    getAASMAFramework().logData(this, "REACT: I WANNA SHOOT " + p);
+                    StopMoving();
+
+                    if (!this.DefendTo(p, 1))
+                    {
+                        Point[] pointBetween = new Point[2];
+                        pointBetween[0] = Location;
+                        pointBetween[1] = p;
+                        MoveTo(Utils.getValidPoint(this.PlayerOwner.Tissue, Utils.getMiddlePoint(pointBetween)));
+                    }
+                    hasReacted = true;
+                }
+                
+
+            }
+
+            //We want the agent to follow the plan that he stopped when reacting
+            if (hasReacted)
+            {
+                if (currentInstruction != null)
+                {
+                    planCheckPoints.Insert(0, currentInstruction);
+                }
+                return true;
+            }
+
+            return false;
         }
 
         public void execute()
@@ -80,13 +127,7 @@ namespace AASMAHoshimi.DeliberativeAgents
                 case PlanCheckPoint.Actions.Attack:
                     if (this.State.Equals(NanoBotState.WaitingOrders))
                     {
-                        if (!this.DefendTo(currentInstruction.location, 3))
-                        {
-                            Point[] pointBetween = new Point[2];
-                            pointBetween[0] = Location;
-                            pointBetween[1] = currentInstruction.location;
-                            MoveTo(Utils.getValidPoint(this.PlayerOwner.Tissue, Utils.getMiddlePoint(pointBetween)));
-                        } 
+                        this.DefendTo(currentInstruction.location, 3);
                     }
                     break;
                 case PlanCheckPoint.Actions.MoveRandom:
@@ -127,7 +168,7 @@ namespace AASMAHoshimi.DeliberativeAgents
                         planIsFinished = false;
                         break;
                     }
-                    
+
             }
         }
 

@@ -29,9 +29,10 @@ namespace AASMAHoshimi.DeliberativeAgents
 
         public override void DoActions()
         {
-            List<KeyValuePair<Desires, Point>> desires = getDesires();
+            
             if (planIsFinished || planImpossible)
             {
+                List<KeyValuePair<Desires, Point>> desires = getDesires();
                 KeyValuePair<Desires, Point> intention = deliberate(desires);
                 plan(intention);
                 execute();
@@ -59,6 +60,25 @@ namespace AASMAHoshimi.DeliberativeAgents
 
             switch (currentInstruction.action)
             {
+                case PlanCheckPoint.Actions.Run:
+                        Point p = currentInstruction.location;
+                        int awayVectorX = this._nanoAI.Location.X - p.X;
+                        int awayVectorY = this._nanoAI.Location.Y - p.Y;
+                       // getAASMAFramework().logData(this._nanoAI, "Me " + _nanoAI.Location.X + "," + _nanoAI.Location.Y);
+                       // getAASMAFramework().logData(this._nanoAI, "PIERRE " + p.X + "," + p.Y);
+                        Point awayPoint = new Point(this._nanoAI.Location.X + (awayVectorX / 2), this._nanoAI.Location.Y + (awayVectorY / 2));
+                        Point validAwayPoint = Utils.getValidPoint(this.getNanoBot().PlayerOwner.Tissue, awayPoint);
+                        //getAASMAFramework().logData(this._nanoAI, "AwayPoint " + awayPoint.X + "," + awayPoint.Y);
+                        //getAASMAFramework().logData(this._nanoAI, "VAwayPoint " + validAwayPoint.X + "," + validAwayPoint.Y);
+                        this._nanoAI.StopMoving();
+                        this._nanoAI.MoveTo(validAwayPoint);
+                        //this._nanoAI.MoveTo(awayPoint);
+                        currentInstruction = null;
+                        this.planCheckPoints.Clear();
+                        planIsFinished = true;
+                  
+                    break;
+
                 case PlanCheckPoint.Actions.Move:
                     if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders))
                     {
@@ -120,6 +140,13 @@ namespace AASMAHoshimi.DeliberativeAgents
             
             switch (intention.Key)
             {
+                case Desires.Run:
+                    planCheckPoints.Clear();
+                    this._nanoAI.StopMoving();
+                    currentInstruction = null;
+                    planCheckPoints.Add(new PlanCheckPoint(intention.Value, PlanCheckPoint.Actions.Run));
+                    planIsFinished = false;
+                    break;
                 case Desires.None:
                     planCheckPoints.Add(new PlanCheckPoint(getNanoBot().Location, PlanCheckPoint.Actions.MoveRandom));
                     planIsFinished = false;
@@ -145,7 +172,14 @@ namespace AASMAHoshimi.DeliberativeAgents
         }
 
         public KeyValuePair<Desires, Point> deliberate(List<KeyValuePair<Desires, Point>> desires) 
-        { 
+        {
+            foreach (KeyValuePair<Desires, Point> desire in desires)
+            {
+                if (desire.Key.Equals(Desires.Run))
+                {
+                    return new KeyValuePair<Desires, Point>(desire.Key, desire.Value);
+                }
+            }
             foreach(KeyValuePair<Desires, Point> desire in desires)
             {
                 if(desire.Key.Equals(Desires.BuildProtector))
@@ -212,6 +246,12 @@ namespace AASMAHoshimi.DeliberativeAgents
                     HoshimiPointPerception p = (HoshimiPointPerception)per;
                     desires.Add(new KeyValuePair<Desires,Point>(Desires.BuildNeedle, p.getPoint()));
                 }
+                if (per.getType().Equals(PerceptionType.EnemyBot))
+                {
+                    EnemyBotPerception p = (EnemyBotPerception)per;
+                    desires.Add(new KeyValuePair<Desires, Point>(Desires.Run, p.getPoint()));
+                }
+
             }
 
             return desires;

@@ -8,6 +8,21 @@ using System.Drawing;
 
 namespace AASMAHoshimi
 {
+    public enum Desires
+    {
+        None,
+        Unload,
+        Collect,
+        BuildContainer,
+        BuildProtector,
+        BuildExplorer,
+        BuildNeedle,
+        Explore,
+        Defend,
+        Attack,
+        Run
+    }
+
     public class Agent
     {
         //protected List<KeyValuePair<RuleConditionDelegate, RuleActionDelegate>> rules = new List<KeyValuePair<RuleConditionDelegate, RuleActionDelegate>>();
@@ -84,6 +99,7 @@ namespace AASMAHoshimi
                     {
                         perceptions.Add(new FriendlyBotPerception(bot, distance));
                     }
+                    
                 }
             }
 
@@ -91,17 +107,13 @@ namespace AASMAHoshimi
             // Other team's bots
             if (perceptionsInterested[(int)PerceptionType.EnemyBot])
             {
-                if (bot_.PlayerOwner.OtherNanoBotsInfo != null)
-                {
-
                     foreach (Point p in aasmaframework.visiblePierres(bot_))
                     {
-                        double distance = Utils.SquareDistance(bot_.Location, p);
-
-                        perceptions.Add(new EnemyBotPerception(p, distance));
+                        //double distance = Utils.SquareDistance(bot_.Location, p);
+                        perceptions.Add(new EnemyBotPerception(p));
 
                     }
-                }
+                
             }
 
             // AZN points
@@ -109,8 +121,8 @@ namespace AASMAHoshimi
             {
                 foreach (Point p in aasmaframework.visibleAznPoints(bot_))
                 {
-                    double distance = Utils.SquareDistance(bot_.Location, p);
-                    perceptions.Add(new AZNPointPerception(p, distance));
+                    //double distance = Utils.SquareDistance(bot_.Location, p);
+                    perceptions.Add(new AZNPointPerception(p));
 
                 }
             }
@@ -122,8 +134,8 @@ namespace AASMAHoshimi
                 {
                     if (!(aasmaframework.visibleEmptyNeedles(bot_).Contains(p) || aasmaframework.visibleFullNeedles(bot_).Contains(p)))
                     {
-                        double distance = Utils.SquareDistance(bot_.Location, p);
-                        perceptions.Add(new HoshimiPointPerception(p, distance));
+                        //double distance = Utils.SquareDistance(bot_.Location, p);
+                        perceptions.Add(new HoshimiPointPerception(p));
                     }
                     
 
@@ -135,8 +147,8 @@ namespace AASMAHoshimi
             {
                 foreach (Point p in aasmaframework.visibleNavigationPoints(bot_))
                 {
-                    double distance = Utils.SquareDistance(bot_.Location, p);
-                    perceptions.Add(new NavPointPerception(p, distance));
+                    //double distance = Utils.SquareDistance(bot_.Location, p);
+                    perceptions.Add(new NavPointPerception(p));
                 }
             }
 
@@ -145,8 +157,8 @@ namespace AASMAHoshimi
             {
                 foreach (Point p in aasmaframework.visibleEmptyNeedles(bot_))
                 {
-                    double distance = Utils.SquareDistance(bot_.Location, p);
-                    perceptions.Add(new EmptyNeedlePerception(p, distance));
+                    //double distance = Utils.SquareDistance(bot_.Location, p);
+                    perceptions.Add(new EmptyNeedlePerception(p));
 
                 }
             }
@@ -156,8 +168,8 @@ namespace AASMAHoshimi
             {
                 foreach (Point p in aasmaframework.visibleFullNeedles(bot_))
                 {
-                    double distance = Utils.SquareDistance(bot_.Location, p);
-                    perceptions.Add(new FullNeedlePerception(p, distance));
+                    //double distance = Utils.SquareDistance(bot_.Location, p);
+                    perceptions.Add(new FullNeedlePerception(p));
 
                 }
             }

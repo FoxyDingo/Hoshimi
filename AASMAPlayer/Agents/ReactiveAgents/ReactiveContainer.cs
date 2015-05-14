@@ -16,6 +16,34 @@ namespace AASMAHoshimi.ReactiveAgents
         public ReactiveContainer()
             : base()
         {
+            //RUN AWAY FROM PIERRES
+            agent.AddRule(
+                delegate(List<Perception> perceptions)
+                {
+                    foreach (Perception per in perceptions)
+                    {
+                        if (per.isType(PerceptionType.EnemyBot))
+                        {
+                            EnemyBotPerception p = (EnemyBotPerception)per;
+                            agent.storeTemp(p.getPoint());
+                            return true;
+                        }
+                    }
+                    
+                    return false;
+                },
+                delegate(ReactiveAgent a, List<Perception> perceptions)
+                {
+                        Point p = (Point) agent.getTemp();
+                        int awayVectorX = this.Location.X - p.X;
+                        int awayVectorY = this.Location.Y - p.Y;
+                        Point awayPoint = new Point(this.Location.X + awayVectorX / 2, this.Location.Y + awayVectorY / 2);
+                        Point validAwayPoint = Utils.getValidPoint(getAASMAFramework().Tissue, awayPoint);
+                        this.StopMoving();
+                        this.MoveTo(validAwayPoint);
+                }
+            );
+            
             //Collect AZN
             agent.AddRule(
                 delegate(List<Perception> perceptions)

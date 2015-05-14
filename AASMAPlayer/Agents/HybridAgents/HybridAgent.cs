@@ -8,19 +8,7 @@ namespace AASMAHoshimi.HybridAgents
 {
     //public delegate void AgentAction(object body, PerceptMemory perceptMemory);
 
-    public enum Desires
-    {
-        None,
-        Unload,
-        Collect,
-        BuildContainer,
-        BuildProtector,
-        BuildExplorer,
-        BuildNeedle,
-        Explore,
-        Defend,
-        Attack
-    }
+    
 
     public class HybridAgent : Agent
     {

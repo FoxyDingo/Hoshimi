@@ -30,6 +30,11 @@ namespace AASMAHoshimi
             this.obj = obj;
             this.distance = distance;
         }
+        public Perception(Object obj)
+        {
+            this.obj = obj;
+            this.distance = 0;
+        }
 
         public double getDistance()
         {
@@ -61,6 +66,7 @@ namespace AASMAHoshimi
     {
         public const PerceptionType TYPE = PerceptionType.EnemyBot;
         public EnemyBotPerception(Point obj, double distance) : base(obj, distance) { }
+        public EnemyBotPerception(Point obj) : base(obj) { }
 
         public Point getPoint()
         {
@@ -76,6 +82,7 @@ namespace AASMAHoshimi
     {
         public const PerceptionType TYPE = PerceptionType.EmptyNeedle;
         public EmptyNeedlePerception(Point obj, double distance) : base(obj, distance) { }
+        public EmptyNeedlePerception(Point obj) : base(obj) { }
 
         public Point getPoint()
         {
@@ -91,6 +98,7 @@ namespace AASMAHoshimi
     {
         public const PerceptionType TYPE = PerceptionType.FullNeedle;
         public FullNeedlePerception(Point obj, double distance) : base(obj, distance) { }
+        public FullNeedlePerception(Point obj) : base(obj) { }
 
         public Point getPoint()
         {
@@ -106,6 +114,7 @@ namespace AASMAHoshimi
     {
         public const PerceptionType TYPE = PerceptionType.AZNPoint;
         public AZNPointPerception(Point obj, double distance) : base(obj, distance) { }
+        public AZNPointPerception(Point obj) : base(obj) { }
 
         public Point getPoint()
         {
@@ -121,6 +130,7 @@ namespace AASMAHoshimi
     {
         public const PerceptionType TYPE = PerceptionType.HoshimiPoint;
         public HoshimiPointPerception(Point obj, double distance) : base(obj, distance) { }
+        public HoshimiPointPerception(Point obj) : base(obj) { }
 
         public Point getPoint()
         {
@@ -136,6 +146,7 @@ namespace AASMAHoshimi
     {
         public const PerceptionType TYPE = PerceptionType.NavPoint;
         public NavPointPerception(Point obj, double distance) : base(obj, distance) { }
+        public NavPointPerception(Point obj) : base(obj) { }
 
         public Point getPoint()
         {

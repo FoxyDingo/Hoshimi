@@ -5,13 +5,13 @@ using PH.Common;
 using System.Drawing;
 
 
-namespace AASMAHoshimi.DeliberativeAgents
+namespace AASMAHoshimi.HybridAgents
 {
 
     [Characteristics(ContainerCapacity = 50, CollectTransfertSpeed = 5, Scan = 0, MaxDamage = 0, DefenseDistance = 0, Constitution = 15)]
-    class DeliberativeContainer : AASMAContainer
+    class HybridContainer : AASMAContainer
     {
-        protected DeliberativeAgent agent ;
+        protected HybridAgent agent;
         private List<PlanCheckPoint> planCheckPoints = new List<PlanCheckPoint>();
         private List<Point> AZNPoints = new List<Point>();
         private bool planIsFinished = true;
@@ -22,7 +22,7 @@ namespace AASMAHoshimi.DeliberativeAgents
         PlanCheckPoint currentInstruction = null;
 
 
-        public DeliberativeContainer()
+        public HybridContainer()
             : base()
         {
             //I'm only interested in AZN and EmptyNeedle and EnemyBot perceptions!!
@@ -30,56 +30,80 @@ namespace AASMAHoshimi.DeliberativeAgents
             interests[0] = (int)PerceptionType.AZNPoint;
             interests[1] = (int)PerceptionType.EmptyNeedle;
             interests[1] = (int)PerceptionType.EnemyBot;
-            agent = new DeliberativeAgent(interests);
+            agent = new HybridAgent(interests);
         }
         public override void DoActions()
         {
-            List<KeyValuePair<Desires, Point>> desires = getDesires();
-            if (planIsFinished || planImpossible)
+            if (!React())
             {
+                List<KeyValuePair<Desires, Point>> desires = getDesires();
+                if (planIsFinished || planImpossible)
+                {
 
-                KeyValuePair<Desires, Point> intention = deliberate(desires);
-                plan(intention);
-                execute();
+                    KeyValuePair<Desires, Point> intention = deliberate(desires);
+                    plan(intention);
+                    execute();
+                }
+                else
+                {
+
+                    execute();
+                }
             }
-            else
+            
+        }
+
+        public bool React()
+        {
+            bool hasReacted = false;
+            //RUN AWAY FROM PIERRES
+            List<Point> points = getAASMAFramework().visiblePierres(this);
+            if (points.Count > 0 && !hasReacted)
             {
+                Point p = Utils.getNearestPoint(this.Location, points);
+                int awayVectorX = Location.X - p.X;
+                int awayVectorY = Location.Y - p.Y;
+                Point awayPoint = new Point(Location.X + awayVectorX / 2, Location.Y + awayVectorY / 2);
+                Point validAwayPoint = Utils.getValidPoint(getAASMAFramework().Tissue, awayPoint);
 
-                execute();
+                StopMoving();
+                MoveTo(validAwayPoint);
+
+                hasReacted = true;
             }
+
+            //We want the agent to follow the plan that he stopped when reacting
+            if (hasReacted)
+            {
+                if (currentInstruction != null)
+                {
+                    planCheckPoints.Insert(0, currentInstruction);
+                }
+                return true;
+            }
+
+            return false;
         }
 
         public void execute()
         {
             if (this.State.Equals(NanoBotState.WaitingOrders))
             {
-                
+
                 if (planCheckPoints.Count == 0)
                 {
                     planIsFinished = true;
                     return;
                 }
-                
+
                 currentInstruction = planCheckPoints[0];
-                getAASMAFramework().logData(this, "I have an instruction " + currentInstruction.action);
+                //getAASMAFramework().logData(this, "I have an instruction " + currentInstruction.action);
                 planCheckPoints.RemoveAt(0);
             }
 
             switch (currentInstruction.action)
             {
-                case PlanCheckPoint.Actions.Run:
-                    Point p = currentInstruction.location;
-                    int awayVectorX = this.Location.X - p.X;
-                    int awayVectorY = this.Location.Y - p.Y;
-                    Point awayPoint = new Point(this.Location.X + awayVectorX / 2, this.Location.Y + awayVectorY / 2);
-                    Point validAwayPoint = Utils.getValidPoint(this.PlayerOwner.Tissue, awayPoint);
-                    this.StopMoving();
-                    this.MoveTo(validAwayPoint);
-                    this.planCheckPoints.Clear();
-                    currentInstruction = null;
-                    planIsFinished = true;
-
-                    break;
+                
                 case PlanCheckPoint.Actions.Move:
                     if (this.State.Equals(NanoBotState.WaitingOrders))
                     {
@@ -88,10 +112,10 @@ namespace AASMAHoshimi.DeliberativeAgents
 
                     break;
                 case PlanCheckPoint.Actions.Collect:
-                    getAASMAFramework().logData(this, "I'm gonna colect");
+                   // getAASMAFramework().logData(this, "I'm gonna colect");
                     if (this.State.Equals(NanoBotState.WaitingOrders))
                     {
-                        int turns = (ContainerCapacity - Stock)/5;
+                        int turns = (ContainerCapacity - Stock) / 5;
                         this.CollectFrom(this.Location, turns);
                     }
                     break;
@@ -118,13 +142,7 @@ namespace AASMAHoshimi.DeliberativeAgents
 
             switch (intention.Key)
             {
-                case Desires.Run:
-                    planCheckPoints.Clear();
-                    this.StopMoving();
-                    currentInstruction = null;
-                    planCheckPoints.Add(new PlanCheckPoint(intention.Value, PlanCheckPoint.Actions.Run));
-                    planIsFinished = false;
-                    break;
+                
                 case Desires.None:
                     planCheckPoints.Add(new PlanCheckPoint(this.Location, PlanCheckPoint.Actions.MoveRandom));
                     planIsFinished = false;
@@ -141,17 +159,14 @@ namespace AASMAHoshimi.DeliberativeAgents
                     break;
             }
         }
-        
+
         public KeyValuePair<Desires, Point> deliberate(List<KeyValuePair<Desires, Point>> desires)
         {
             List<Point> pointsUnload = new List<Point>();
             List<Point> pointsCollect = new List<Point>();
             foreach (KeyValuePair<Desires, Point> desire in desires)
             {
-                if (desire.Key.Equals(Desires.Run))
-                {
-                    return new KeyValuePair<Desires, Point>(desire.Key, desire.Value);
-                }
+                
                 if (desire.Key.Equals(Desires.Unload))
                 {
                     pointsUnload.Add(desire.Value);
@@ -173,7 +188,7 @@ namespace AASMAHoshimi.DeliberativeAgents
                 Point p = Utils.getNearestPoint(this.Location, temp);
                 return new KeyValuePair<Desires, Point>(Desires.Collect, p);
             }
-            
+
             return new KeyValuePair<Desires, Point>(Desires.None, new Point());
         }
 
@@ -200,13 +215,8 @@ namespace AASMAHoshimi.DeliberativeAgents
                     EmptyNeedlePerception p = (EmptyNeedlePerception)per;
                     desires.Add(new KeyValuePair<Desires, Point>(Desires.Unload, p.getPoint()));
                 }
-                //RUN AWAY
-                if (per.isType(PerceptionType.EnemyBot))
-                {
-                    EnemyBotPerception p = (EnemyBotPerception)per;
-                    desires.Add(new KeyValuePair<Desires, Point>(Desires.Run, p.getPoint()));
-                }
                 
+
             }
 
             return desires;
@@ -235,3 +245,4 @@ namespace AASMAHoshimi.DeliberativeAgents
 
     }
 }
+

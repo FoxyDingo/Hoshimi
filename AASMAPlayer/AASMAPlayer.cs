@@ -9,6 +9,7 @@ using AASMAHoshimi.Examples;
 using AASMAHoshimi.ISCommunicativeAgents;
 using AASMAHoshimi.ReactiveAgents;
 using AASMAHoshimi.DeliberativeAgents;
+using AASMAHoshimi.HybridAgents;
 
 namespace AASMAHoshimi
 {
@@ -43,7 +44,7 @@ namespace AASMAHoshimi
         
         public virtual AASMAAI buildAIAgent(NanoAI nanoAI)
         {
-            return new ReactiveAI(nanoAI);
+            return new HybridAI(nanoAI);
         }
 
         #region AASMA_STUDENTS-DO_NOT_CHANGE_ANYTHING_HERE

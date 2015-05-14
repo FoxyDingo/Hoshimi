@@ -15,11 +15,39 @@ namespace AASMAHoshimi.ReactiveAgents
         public ReactiveExplorer() : base() 
         {
 
-            //I'm only interested in NavPoint perceptions!!
-            int[] interests = new int[1];
+            //I'm only interested in NavPoint and EnemyBot perceptions!!
+            int[] interests = new int[2];
             interests[0] = (int)PerceptionType.NavPoint;
+            interests[1] = (int)PerceptionType.EnemyBot;
             agent = new ReactiveAgent(interests);
 
+            //RUN AWAY FROM PIERRES
+            agent.AddRule(
+                delegate(List<Perception> perceptions)
+                {
+                    foreach (Perception per in perceptions)
+                    {
+                        if (per.isType(PerceptionType.EnemyBot))
+                        {
+                            EnemyBotPerception p = (EnemyBotPerception)per;
+                            agent.storeTemp(p.getPoint());
+                            return true;
+                        }
+                    }
+
+                    return false;
+                },
+                delegate(ReactiveAgent a, List<Perception> perceptions)
+                {
+                    Point p = (Point)agent.getTemp();
+                    int awayVectorX = this.Location.X - p.X;
+                    int awayVectorY = this.Location.Y - p.Y;
+                    Point awayPoint = new Point(this.Location.X + awayVectorX / 2, this.Location.Y + awayVectorY / 2);
+                    Point validAwayPoint = Utils.getValidPoint(getAASMAFramework().Tissue, awayPoint);
+                    this.StopMoving();
+                    this.MoveTo(validAwayPoint);
+                }
+            );
 
             //Move away from nav point
             agent.AddRule(

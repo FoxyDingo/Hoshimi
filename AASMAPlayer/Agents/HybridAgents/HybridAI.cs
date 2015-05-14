@@ -48,24 +48,56 @@ namespace AASMAHoshimi.HybridAgents
 
         public bool React()
         {
-            //TODO RUN AWAY FROM PIERRES
-            if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders) && this._protectorNumber < 10)
+            bool hasReacted = false;
+            //RUN AWAY FROM PIERRES
+            List<Point> points = getAASMAFramework().visiblePierres(this.getNanoBot());
+            if (points.Count > 0 && !hasReacted)
             {
+                Point p = Utils.getNearestPoint(this.getNanoBot().Location, points);
+                int awayVectorX = getNanoBot().Location.X - p.X;
+                int awayVectorY = getNanoBot().Location.Y - p.Y;
+                Point awayPoint = new Point(getNanoBot().Location.X + awayVectorX / 2, getNanoBot().Location.Y + awayVectorY / 2);
+                Point validAwayPoint = Utils.getValidPoint(getAASMAFramework().Tissue, awayPoint );
+
+                getNanoBot().StopMoving();
+                getNanoBot().MoveTo(validAwayPoint);
+
+                hasReacted = true;
+            }
+            if ( this._protectorNumber < 10 && !hasReacted)
+            {
+                _nanoAI.StopMoving();
                 this._nanoAI.Build(typeof(HybridProtector), "P" + this._protectorNumber++);
+                hasReacted = true;
 
             }
-            if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders) && this._explorerNumber < 10)
+            if (this._explorerNumber < 10 && !hasReacted)
             {
+                _nanoAI.StopMoving();
                 this._nanoAI.Build(typeof(HybridExplorer), "E" + this._explorerNumber++);
+                hasReacted = true;
 
             }
-            if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders) && this._containerNumber < 10)
+            if (this._containerNumber < 10 && !hasReacted)
             {
-                this._nanoAI.Build(typeof(HybridContainer), "C" + this._containerNumber++);
+                _nanoAI.StopMoving();
+               this._nanoAI.Build(typeof(HybridContainer), "C" + this._containerNumber++);
+                hasReacted = true;
 
             }
+            //We want the agent to follow the plan that he stopped when reacting
+            if (hasReacted)
+            {
+                if (currentInstruction != null)
+                {
+                    planCheckPoints.Insert(0, currentInstruction);
+                }
+                return true;
+            }
+            
             return false;
         }
+
         public void execute()
         {
             if (this.getNanoBot().State.Equals(NanoBotState.WaitingOrders))

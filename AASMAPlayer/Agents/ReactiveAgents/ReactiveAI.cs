@@ -20,6 +20,34 @@ namespace AASMAHoshimi.ReactiveAgents
         public ReactiveAI(NanoAI nanoAI)
             : base(nanoAI)
         {
+            //RUN AWAY FROM PIERRES
+            agent.AddRule(
+                delegate(List<Perception> perceptions)
+                {
+                    foreach (Perception per in perceptions)
+                    {
+                        if (per.isType(PerceptionType.EnemyBot))
+                        {
+                            EnemyBotPerception p = (EnemyBotPerception)per;
+                            agent.storeTemp(p.getPoint());
+                            return true;
+                        }
+                    }
+
+                    return false;
+                },
+                delegate(ReactiveAgent a, List<Perception> perceptions)
+                {
+                    Point p = (Point)agent.getTemp();
+                    int awayVectorX = this._nanoAI.Location.X - p.X;
+                    int awayVectorY = this._nanoAI.Location.Y - p.Y;
+                    Point awayPoint = new Point(this._nanoAI.Location.X + awayVectorX / 2, this._nanoAI.Location.Y + awayVectorY / 2);
+                    Point validAwayPoint = Utils.getValidPoint(getAASMAFramework().Tissue, awayPoint);
+                    this._nanoAI.StopMoving();
+                    this._nanoAI.MoveTo(validAwayPoint);
+                }
+            );
+
             //builds protectors
             agent.AddRule(
                 delegate(List<Perception> perceptions)

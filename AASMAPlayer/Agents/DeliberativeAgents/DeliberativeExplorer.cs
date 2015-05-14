@@ -10,7 +10,7 @@ namespace AASMAHoshimi.DeliberativeAgents
     [Characteristics(ContainerCapacity = 0, CollectTransfertSpeed = 0, Scan = 30, MaxDamage = 0, DefenseDistance = 0, Constitution = 10)]
     public class DeliberativeExplorer : AASMAExplorer
     {
-        protected DeliberativeAgent agent = new DeliberativeAgent();
+        protected DeliberativeAgent agent;
         private List<PlanCheckPoint> planCheckPoints = new List<PlanCheckPoint>();
         private List<Point> navPointsVisited = new List<Point>();
         private bool planIsFinished = true;
@@ -23,9 +23,10 @@ namespace AASMAHoshimi.DeliberativeAgents
         public DeliberativeExplorer()
             : base()
         {
-            //I'm only interested in NavPoint perceptions!!
-            int[] interests = new int[1];
+            //I'm only interested in NavPoint and EnemyBot perceptions!!
+            int[] interests = new int[2];
             interests[0] = (int)PerceptionType.NavPoint;
+            interests[1] = (int)PerceptionType.EnemyBot;
             agent = new DeliberativeAgent(interests);
         }
 
@@ -78,6 +79,19 @@ namespace AASMAHoshimi.DeliberativeAgents
 
             switch (currentInstruction.action)
             {
+                case PlanCheckPoint.Actions.Run:
+                    Point p = currentInstruction.location;
+                    int awayVectorX = this.Location.X - p.X;
+                    int awayVectorY = this.Location.Y - p.Y;
+                    Point awayPoint = new Point(this.Location.X + awayVectorX / 2, this.Location.Y + awayVectorY / 2);
+                    Point validAwayPoint = Utils.getValidPoint(this.PlayerOwner.Tissue, awayPoint);
+                    this.StopMoving();
+                    this.MoveTo(validAwayPoint);
+                    this.planCheckPoints.Clear();
+                    currentInstruction = null;
+                    planIsFinished = true;
+
+                    break;
                 case PlanCheckPoint.Actions.Move:
                     if (this.State.Equals(NanoBotState.WaitingOrders))
                     {
@@ -101,6 +115,13 @@ namespace AASMAHoshimi.DeliberativeAgents
 
             switch (intention.Key)
             {
+                case Desires.Run:
+                    planCheckPoints.Clear();
+                    this.StopMoving();
+                    currentInstruction = null;
+                    planCheckPoints.Add(new PlanCheckPoint(intention.Value, PlanCheckPoint.Actions.Run));
+                    planIsFinished = false;
+                    break;
                 case Desires.None:
                     planCheckPoints.Add(new PlanCheckPoint(this.Location, PlanCheckPoint.Actions.MoveRandom));
                     planIsFinished = false;
@@ -117,6 +138,11 @@ namespace AASMAHoshimi.DeliberativeAgents
             List<Point> points = new List<Point>();
             foreach (KeyValuePair<Desires, Point> desire in desires)
             {
+                if (desire.Key.Equals(Desires.Run))
+                {
+                    return new KeyValuePair<Desires, Point>(Desires.Run, desire.Value);
+                }
+
                 if (desire.Key.Equals(Desires.Explore))
                 {
                     points.Add(desire.Value);
@@ -137,6 +163,11 @@ namespace AASMAHoshimi.DeliberativeAgents
             
             foreach (Perception per in perceptions)
             {
+                if (per.isType(PerceptionType.EnemyBot))
+                {
+                    EnemyBotPerception p = (EnemyBotPerception)per;
+                    desires.Add(new KeyValuePair<Desires, Point>(Desires.Run, p.getPoint()));
+                }
                 if (per.getType().Equals(PerceptionType.NavPoint))
                 {
                     NavPointPerception p = (NavPointPerception)per;

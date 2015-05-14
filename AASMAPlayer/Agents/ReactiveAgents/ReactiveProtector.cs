@@ -59,7 +59,13 @@ namespace AASMAHoshimi.ReactiveAgents
                 {
                     getAASMAFramework().logData(this, "I will shoot someone ");
                     Point p = (Point)agent.getTemp();
-                    this.DefendTo(p, 1);
+                    if (!this.DefendTo(p, 1))
+                    {
+                        Point[] pointBetween = new Point[2];
+                        pointBetween[0] = Location;
+                        pointBetween[1] = p;
+                        MoveTo(Utils.getValidPoint(this.PlayerOwner.Tissue, Utils.getMiddlePoint(pointBetween)));
+                    }
                 }
             );
 
